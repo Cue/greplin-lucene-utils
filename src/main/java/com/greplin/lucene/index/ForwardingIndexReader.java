@@ -366,8 +366,8 @@ public class ForwardingIndexReader extends IndexReader {
 
 
   @Override
-  public Object getFieldCacheKey() {
-    return delegate.getFieldCacheKey();
+  public Object getCoreCacheKey() {
+    return delegate.getCoreCacheKey();
   }
 
 
