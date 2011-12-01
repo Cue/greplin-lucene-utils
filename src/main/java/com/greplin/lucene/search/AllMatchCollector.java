@@ -18,7 +18,6 @@ package com.greplin.lucene.search;
 
 import com.google.common.collect.Lists;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexReader;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,11 +26,6 @@ import java.util.List;
  * Saves all matches it encounters, in no particular order.
  */
 public class AllMatchCollector extends UnorderedCollector {
-  /**
-   * The current reader.
-   */
-  private IndexReader currentReader;
-
   /**
    * List of documents.
    */
@@ -45,15 +39,10 @@ public class AllMatchCollector extends UnorderedCollector {
     docs = Lists.newLinkedList();
   }
 
-  @Override
-  public final void collect(final int doc) throws IOException {
-    docs.add(currentReader.document(doc));
-  }
 
   @Override
-  public final void setNextReader(final IndexReader reader,
-                                  final int docBase) throws IOException {
-    currentReader = reader;
+  public final void collect(final int doc) throws IOException {
+    docs.add(getCurrentReader().document(doc));
   }
 
 

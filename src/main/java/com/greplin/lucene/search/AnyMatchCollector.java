@@ -17,7 +17,6 @@
 package com.greplin.lucene.search;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexReader;
 
 import java.io.IOException;
 
@@ -30,11 +29,6 @@ public class AnyMatchCollector extends UnorderedCollector {
    */
   private Document hit = null;
 
-  /**
-   * The current reader.
-   */
-  private IndexReader currentReader;
-
 
   /**
    * Returns the first matched document, or null if none matched.
@@ -44,17 +38,11 @@ public class AnyMatchCollector extends UnorderedCollector {
     return hit;
   }
 
+
   @Override
   public final void collect(final int doc) throws IOException {
     if (hit == null) {
-      hit = currentReader.document(doc);
+      hit = getCurrentReader().document(doc);
     }
-  }
-
-  @Override
-  public final void setNextReader(final IndexReader reader,
-                                  final int docBase)
-      throws IOException {
-    currentReader = reader;
   }
 }

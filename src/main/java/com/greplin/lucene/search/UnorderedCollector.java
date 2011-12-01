@@ -16,8 +16,6 @@
 
 package com.greplin.lucene.search;
 
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Scorer;
 
 import java.io.IOException;
@@ -25,7 +23,7 @@ import java.io.IOException;
 /**
  * Base class for a collectors that collect documents in no specific order.
  */
-public abstract class UnorderedCollector extends Collector {
+public abstract class UnorderedCollector extends BaseCollector {
   @Override
   public final void setScorer(final Scorer scorer) throws IOException {
     // Do nothing.
@@ -39,10 +37,4 @@ public abstract class UnorderedCollector extends Collector {
 
   @Override
   public abstract void collect(final int doc) throws IOException;
-
-
-  @Override
-  public abstract void setNextReader(final IndexReader reader,
-                                     final int docBase)
-      throws IOException;
 }
