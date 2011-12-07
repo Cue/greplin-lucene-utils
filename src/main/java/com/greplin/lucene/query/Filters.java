@@ -4,11 +4,12 @@
 
 package com.greplin.lucene.query;
 
-import com.sun.istack.internal.Nullable;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanFilter;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FilterClause;
+
+import javax.annotation.Nullable;
 
 /**
  * Static utility methods for Filters.
