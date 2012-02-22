@@ -34,7 +34,16 @@ public class BooleanQueryBuilder {
    * Constructs a query builder.
    */
   public BooleanQueryBuilder() {
-    result = new BooleanQuery();
+    this(false);
+  }
+
+
+  /**
+   * Constructs a query builder, optionally disabling coordination.
+   * @param disableCoordination whether to disable score coordination
+   */
+  public BooleanQueryBuilder(final boolean disableCoordination) {
+    result = new BooleanQuery(disableCoordination);
   }
 
 
