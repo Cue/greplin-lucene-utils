@@ -2,7 +2,7 @@
  * Copyright 2012 Greplin, Inc. All Rights Reserved.
  */
 
-package com.greplin.lucene.query;
+package com.greplin.lucene.filter;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;

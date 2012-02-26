@@ -2,7 +2,7 @@
  * Copyright 2011 Greplin, Inc. All Rights Reserved.
  */
 
-package com.greplin.lucene.query;
+package com.greplin.lucene.filter;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanFilter;
