@@ -31,6 +31,14 @@ public class FixedBitSetSlice extends DocIdSetSlice {
 
 
   /**
+   * @return the underlying FixedBitSet
+   */
+  public FixedBitSet getUnderlying() {
+    return underlying;
+  }
+
+
+  /**
    * Sets the index-th bit of this slice, meaning the
    * (start + index)th bit of the underlying bitset.
    * @param index the index into the slice to set
