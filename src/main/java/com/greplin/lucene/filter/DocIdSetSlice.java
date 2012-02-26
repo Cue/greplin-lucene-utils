@@ -102,4 +102,20 @@ public class DocIdSetSlice extends DocIdSet {
     return new Iterator();
   }
 
+
+  /**
+   * @return the index into the underying DocIdSet where this slice begins.
+   */
+  public int getStart() {
+    return start;
+  }
+
+
+  /**
+   * @return the index into the underying DocIdSet where this slice ends.
+   */
+  public int getEnd() {
+    return end;
+  }
+
 }
