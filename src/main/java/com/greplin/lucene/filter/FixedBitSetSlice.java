@@ -39,6 +39,17 @@ public class FixedBitSetSlice extends DocIdSetSlice {
 
 
   /**
+   * Gets the index-th bit of this slice, meaning the
+   * (start + index)th bit of the underlying bitset.
+   * @param index the index into the slice to get
+   * @return whether the bit is set
+   */
+  public boolean get(final int index) {
+    return this.underlying.get(index + this.getStart());
+  }
+
+
+  /**
    * Sets the index-th bit of this slice, meaning the
    * (start + index)th bit of the underlying bitset.
    * @param index the index into the slice to set
