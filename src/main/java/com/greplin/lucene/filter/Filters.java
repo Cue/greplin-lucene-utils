@@ -21,6 +21,36 @@ public final class Filters {
 
 
   /**
+   * Returns a filter that allows documents that match any constituent
+   * filter.  For convenience, null values are accepted and ignored.  If
+   * all values are null, null will be returned.
+   * @param filters the filters to combine
+   * @return the combined filter
+   */
+  @Nullable public static Filter or(@Nullable final Filter... filters) {
+    final BooleanFilter booleanFilter = new BooleanFilter();
+
+    Filter lastFilter = null;
+    int count = 0;
+    for (Filter filter : filters) {
+      if (filter != null) {
+        booleanFilter.add(new FilterClause(filter, BooleanClause.Occur.SHOULD));
+        count += 1;
+        lastFilter = filter;
+      }
+    }
+
+    if (count == 0) {
+      return null;
+    } else if (count == 1) {
+      return lastFilter;
+    } else {
+      return booleanFilter;
+    }
+  }
+
+
+  /**
    * Returns a filter that allows documents that match every constituent
    * filter.  For convenience, null values are accepted and ignored.  If
    * all values are null, null will be returned.
