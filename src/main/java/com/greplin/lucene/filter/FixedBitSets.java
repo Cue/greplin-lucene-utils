@@ -4,12 +4,15 @@
 
 package com.greplin.lucene.filter;
 
+import com.google.common.collect.Lists;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
+import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.FixedBitSet;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Common FixedBitSets.
@@ -72,6 +75,26 @@ public final class FixedBitSets {
       result.set(termDocs.doc());
     }
     return result;
+  }
+
+
+  /**
+   * Converts a fixed bit set to a list.
+   * @param bitSet the bit set to convert.
+   * @return the list of matching document ids.
+   */
+  public static List<Integer> asList(final FixedBitSet bitSet) {
+    DocIdSetIterator it = bitSet.iterator();
+    List<Integer> ints = Lists.newArrayList();
+    try {
+      while (it.nextDoc() != DocIdSetIterator.NO_MORE_DOCS) {
+        ints.add(it.docID());
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(
+          "Impossible IOException when iterating in memory");
+    }
+    return ints;
   }
 
 }
