@@ -4,9 +4,9 @@
 
 package com.greplin.lucene.filter;
 
-import com.greplin.lucene.query.SegmentPredicate;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
+import org.apache.lucene.util.Bits;
 
 import java.io.IOException;
 
@@ -24,7 +24,7 @@ public class PredicateDocIdSet extends DocIdSet {
   /**
    * The predicate to match against.
    */
-  private final SegmentPredicate predicate;
+  private final Bits predicate;
 
 
   /**
@@ -33,7 +33,7 @@ public class PredicateDocIdSet extends DocIdSet {
    * @param predicate the predicate.
    */
   public PredicateDocIdSet(final DocIdSet docIdSet,
-                           final SegmentPredicate predicate) {
+                           final Bits predicate) {
     this.docIdSet = docIdSet;
     this.predicate = predicate;
   }
@@ -63,7 +63,7 @@ public class PredicateDocIdSet extends DocIdSet {
     /**
      * The predicate ot match against.
      */
-    private final SegmentPredicate predicate;
+    private final Bits predicate;
 
 
     /**
@@ -72,7 +72,7 @@ public class PredicateDocIdSet extends DocIdSet {
      * @param predicate the predicate to filter with.
      */
     private PredicateDocIdSetIterator(final DocIdSetIterator iterator,
-                                      final SegmentPredicate predicate) {
+                                      final Bits predicate) {
       this.iterator = iterator;
       this.predicate = predicate;
     }
@@ -88,7 +88,7 @@ public class PredicateDocIdSet extends DocIdSet {
     public int nextDoc() throws IOException {
       for (;;) {
         int next = this.iterator.nextDoc();
-        if (next == NO_MORE_DOCS || this.predicate.isIncluded(next)) {
+        if (next == NO_MORE_DOCS || this.predicate.get(next)) {
           return next;
         }
       }
@@ -98,7 +98,7 @@ public class PredicateDocIdSet extends DocIdSet {
     @Override
     public int advance(final int target) throws IOException {
       int docId = this.iterator.advance(target);
-      if (docId == NO_MORE_DOCS || this.predicate.isIncluded(docId)) {
+      if (docId == NO_MORE_DOCS || this.predicate.get(docId)) {
         return docId;
       } else {
         return nextDoc();

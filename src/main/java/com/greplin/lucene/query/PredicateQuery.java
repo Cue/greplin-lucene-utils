@@ -5,6 +5,7 @@
 package com.greplin.lucene.query;
 
 import com.google.common.base.Objects;
+import com.greplin.lucene.filter.BitsProvider;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSetIterator;
@@ -14,6 +15,7 @@ import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.Weight;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.ToStringUtils;
 
 import java.io.IOException;
@@ -35,7 +37,7 @@ public class PredicateQuery extends Query {
   /**
    * The predicate to match against.
    */
-  private final DocPredicate predicate;
+  private final BitsProvider predicate;
 
 
   /**
@@ -44,7 +46,7 @@ public class PredicateQuery extends Query {
    * @param query Query to be filtered.
    * @param predicate Provider of predicates to apply to the query.
    */
-  public PredicateQuery(final Query query, final DocPredicate predicate) {
+  public PredicateQuery(final Query query, final BitsProvider predicate) {
     this.query = query;
     this.predicate = predicate;
   }
@@ -89,8 +91,8 @@ public class PredicateQuery extends Query {
       public Explanation explain(final IndexReader reader, final int i)
           throws IOException {
         Explanation inner = weight.explain(reader, i);
-        SegmentPredicate predicate = PredicateQuery.this.predicate.get(reader);
-        if (predicate.isIncluded(i)) {
+        Bits predicate = PredicateQuery.this.predicate.get(reader);
+        if (predicate.get(i)) {
           return inner;
         } else {
           Explanation result = new Explanation(0.0f,
@@ -110,7 +112,7 @@ public class PredicateQuery extends Query {
                            final boolean scoreDocsInOrder,
                            final boolean topScorer)
           throws IOException {
-        SegmentPredicate predicate = PredicateQuery.this.predicate.get(reader);
+        Bits predicate = PredicateQuery.this.predicate.get(reader);
         return PredicateQuery.getScorer(
             reader, similarity, weight, this, predicate);
       }
@@ -125,14 +127,14 @@ public class PredicateQuery extends Query {
    * @param similarity the Similarity to use
    * @param weight the weight object of the underlying query
    * @param wrapperWeight the weight object.
-   * @param predicate the SegmentPredicate to use.
+   * @param predicate the Bits to use.
    * @return a scorer that matches the documents matched by the filter.
    * @throws IOException on IO error
    */
   private static Scorer getScorer(
       final IndexReader indexReader, final Similarity similarity,
       final Weight weight, final Weight wrapperWeight,
-      final SegmentPredicate predicate) throws IOException {
+      final Bits predicate) throws IOException {
     // We will advance() this scorer, so we set inorder=true/toplevel=false.
     final Scorer scorer = weight.scorer(indexReader, true, false);
     return (scorer == null) ? null : new Scorer(similarity, wrapperWeight) {
@@ -142,7 +144,7 @@ public class PredicateQuery extends Query {
         for (;;) {
           int docId = scorer.nextDoc();
           if (docId == DocIdSetIterator.NO_MORE_DOCS
-              || predicate.isIncluded(scorer.docID())) {
+              || predicate.get(scorer.docID())) {
             return docId;
           }
         }
@@ -152,7 +154,7 @@ public class PredicateQuery extends Query {
       public int advance(final int target) throws IOException {
         scorer.advance(target);
         if (scorer.docID() == DocIdSetIterator.NO_MORE_DOCS
-            || predicate.isIncluded(scorer.docID())) {
+            || predicate.get(scorer.docID())) {
           return scorer.docID();
         }
         return nextDoc();
@@ -199,7 +201,7 @@ public class PredicateQuery extends Query {
   /**
    * @return the predicate.
    */
-  public DocPredicate getPredicate() {
+  public BitsProvider getPredicate() {
     return this.predicate;
   }
 

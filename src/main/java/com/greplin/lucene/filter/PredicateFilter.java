@@ -4,7 +4,6 @@
 
 package com.greplin.lucene.filter;
 
-import com.greplin.lucene.query.DocPredicate;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
@@ -25,7 +24,7 @@ public class PredicateFilter extends Filter {
   /**
    * The predicate to match against.
    */
-  private final DocPredicate predicate;
+  private final BitsProvider predicate;
 
 
   /**
@@ -33,7 +32,7 @@ public class PredicateFilter extends Filter {
    * @param filter the filter to further filter.
    * @param predicate the predicate.
    */
-  public PredicateFilter(final Filter filter, final DocPredicate predicate) {
+  public PredicateFilter(final Filter filter, final BitsProvider predicate) {
     this.filter = filter;
     this.predicate = predicate;
   }
