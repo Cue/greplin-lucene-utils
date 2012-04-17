@@ -4,6 +4,7 @@
 
 package com.greplin.lucene.filter;
 
+import com.greplin.lucene.predicate.BitsProvider;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;

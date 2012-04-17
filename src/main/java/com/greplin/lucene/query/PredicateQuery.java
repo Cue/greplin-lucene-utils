@@ -5,7 +5,7 @@
 package com.greplin.lucene.query;
 
 import com.google.common.base.Objects;
-import com.greplin.lucene.filter.BitsProvider;
+import com.greplin.lucene.predicate.BitsProvider;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSetIterator;

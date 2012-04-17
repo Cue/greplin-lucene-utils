@@ -7,6 +7,7 @@ package com.greplin.lucene.filter;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.greplin.lucene.predicate.BitsProvider;
 import org.apache.lucene.index.FilterIndexReader;
 import org.apache.lucene.index.IndexCommit;
 import org.apache.lucene.index.IndexReader;

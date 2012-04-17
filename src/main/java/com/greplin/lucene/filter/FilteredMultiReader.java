@@ -4,6 +4,7 @@
 
 package com.greplin.lucene.filter;
 
+import com.greplin.lucene.predicate.BitsProvider;
 import org.apache.lucene.index.HackMultiTermDocs;
 import org.apache.lucene.index.HackMultiTermPositions;
 import org.apache.lucene.index.IndexReader;

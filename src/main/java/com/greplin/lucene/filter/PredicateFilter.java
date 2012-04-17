@@ -4,6 +4,8 @@
 
 package com.greplin.lucene.filter;
 
+import com.greplin.lucene.predicate.BitsProvider;
+import com.greplin.lucene.predicate.PredicateDocIdSet;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;

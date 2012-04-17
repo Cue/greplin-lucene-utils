@@ -2,7 +2,7 @@
  * Copyright 2012 Greplin, Inc. All Rights Reserved.
  */
 
-package com.greplin.lucene.query;
+package com.greplin.lucene.predicate;
 
 import org.apache.lucene.util.Bits;
 
@@ -17,7 +17,7 @@ public abstract class Predicate implements Bits {
 
   @Override
   public int length() {
-    return 0;
+    throw new UnsupportedOperationException();
   }
 
 }
