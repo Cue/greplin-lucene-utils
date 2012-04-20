@@ -4,10 +4,12 @@
 
 package com.greplin.lucene.filter;
 
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanFilter;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FilterClause;
+import org.apache.lucene.search.TermsFilter;
 
 import javax.annotation.Nullable;
 
@@ -89,6 +91,20 @@ public final class Filters {
     final BooleanFilter booleanFilter = new BooleanFilter();
     booleanFilter.add(new FilterClause(filter, BooleanClause.Occur.MUST_NOT));
     return booleanFilter;
+  }
+
+
+  /**
+   * Returns a terms filter matching the given terms.
+   * @param terms the terms to match
+   * @return the terms filter
+   */
+  public static TermsFilter terms(final Term... terms) {
+    TermsFilter result = new TermsFilter();
+    for (Term term : terms) {
+      result.addTerm(term);
+    }
+    return result;
   }
 
 }
