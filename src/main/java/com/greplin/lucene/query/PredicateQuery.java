@@ -154,7 +154,7 @@ public class PredicateQuery extends Query {
       public int advance(final int target) throws IOException {
         scorer.advance(target);
         if (scorer.docID() == DocIdSetIterator.NO_MORE_DOCS
-            || predicate.get(scorer.docID())) {
+            || (scorer.docID() >= 0 && predicate.get(scorer.docID()))) {
           return scorer.docID();
         }
         return nextDoc();
