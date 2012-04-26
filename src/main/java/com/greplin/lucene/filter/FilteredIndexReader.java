@@ -166,7 +166,7 @@ public abstract class FilteredIndexReader
   /**
    * @return the underlying reader being filtered.
    */
-  protected IndexReader getUnderlyingReader() {
+  public IndexReader getUnderlyingReader() {
     return this.in;
   }
 
