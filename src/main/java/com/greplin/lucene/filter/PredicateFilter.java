@@ -4,6 +4,7 @@
 
 package com.greplin.lucene.filter;
 
+import com.google.common.base.Objects;
 import com.greplin.lucene.predicate.BitsProvider;
 import com.greplin.lucene.predicate.PredicateDocIdSet;
 import org.apache.lucene.index.IndexReader;
@@ -45,6 +46,15 @@ public class PredicateFilter extends Filter {
     return new PredicateDocIdSet(
         this.filter.getDocIdSet(reader),
         this.predicate.get(reader));
+  }
+
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(PredicateFilter.class)
+        .add("filter", this.filter)
+        .add("predicate", this.predicate)
+        .toString();
   }
 
 }
