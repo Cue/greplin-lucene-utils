@@ -4,9 +4,6 @@
 
 package com.greplin.lucene.filter;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.greplin.lucene.predicate.BitsProvider;
 import org.apache.lucene.index.FilterIndexReader;
 import org.apache.lucene.index.IndexCommit;
@@ -44,55 +41,57 @@ public abstract class FilteredIndexReader
 
 
   /**
+   * Cache key provider.
+   */
+  private final CacheKeyProvider cacheKeyProvider;
+
+
+  /**
    * Wraps the given index reader with the appropriate filtered reader type.
    * @param reader the index reader.
    * @param bitsProvider provider of filter bits.
    * @return an index reader filtered by the given bits.
    */
-  public static FilteredIndexReader wrap(final IndexReader reader,
-                                         final BitsProvider bitsProvider) {
-    if (reader.getSequentialSubReaders() == null) {
-      return new FilteredSegmentReader(reader, bitsProvider);
-    } else {
-      return new FilteredMultiReader(reader, bitsProvider);
-    }
+  public static FilteredIndexReader wrap(
+      final IndexReader reader,
+      final BitsProvider bitsProvider) {
+    return wrap(
+        reader, bitsProvider, new FilteredCacheKeyProvider(bitsProvider));
   }
 
 
   /**
-   * We need to have the key have the same lifetime as this object, and also be
-   * the same object across all similar instances of FilteredIndexReader.  Not
-   * pretty but it's necessary.
+   * Wraps the given index reader with the appropriate filtered reader type.
+   * @param reader the index reader.
+   * @param bitsProvider provider of filter bits.
+   * @return an index reader filtered by the given bits.
+   * @param cacheKeyProvider provider of cache keys.
    */
-  private static final LoadingCache<Object, LoadingCache<Object, Object>>
-      KEYS = CacheBuilder.newBuilder().weakKeys().build(
-          new CacheLoader<Object, LoadingCache<Object, Object>>() {
-            @Override
-            public LoadingCache<Object, Object> load(final Object key)
-                throws Exception {
-              return CacheBuilder.newBuilder().weakKeys().build(
-                  new CacheLoader<Object, Object>() {
-                    @Override
-                    public Object load(final Object key) throws Exception {
-                      return new Object();
-                    }
-                  }
-              );
-            }
-          });
+  public static FilteredIndexReader wrap(
+      final IndexReader reader,
+      final BitsProvider bitsProvider,
+      final CacheKeyProvider cacheKeyProvider) {
+    if (reader.getSequentialSubReaders() == null) {
+      return new FilteredSegmentReader(reader, bitsProvider, cacheKeyProvider);
+    } else {
+      return new FilteredMultiReader(reader, bitsProvider, cacheKeyProvider);
+    }
+  }
 
 
   /**
    * Creates a filtered index reader with the given bits provider.
    * @param base the underlying reader.
    * @param bitsProvider the provider of filter bits.
+   * @param cacheKeyProvider provider of cache keys.
    */
   protected FilteredIndexReader(final IndexReader base,
-                                final BitsProvider bitsProvider) {
+                                final BitsProvider bitsProvider,
+                                final CacheKeyProvider cacheKeyProvider) {
     super(base);
     this.bitsProvider = bitsProvider;
-    this.cacheKey = KEYS.getUnchecked(base.getCoreCacheKey())
-        .getUnchecked(bitsProvider.getCacheKey());
+    this.cacheKeyProvider = cacheKeyProvider;
+    this.cacheKey = cacheKeyProvider.getCoreCacheKey(base);
   }
 
 
@@ -182,6 +181,14 @@ public abstract class FilteredIndexReader
 
   @Override
   public abstract IndexReader[] getSequentialSubReaders();
+
+
+  /**
+   * @return the cache key provider for this reader.
+   */
+  public CacheKeyProvider getCacheKeyProvider() {
+    return this.cacheKeyProvider;
+  }
 
 
   @Override

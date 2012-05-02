@@ -31,10 +31,12 @@ public class FilteredSegmentReader extends FilteredIndexReader {
    * Creates a filtered index reader with the given bits provider.
    * @param base the underlying reader.
    * @param bitsProvider the provider of filter bits.
+   * @param cacheKeyProvider provider of cache keys.
    */
   public FilteredSegmentReader(final IndexReader base,
-                               final BitsProvider bitsProvider) {
-    super(base, bitsProvider);
+                               final BitsProvider bitsProvider,
+                               final CacheKeyProvider cacheKeyProvider) {
+    super(base, bitsProvider, cacheKeyProvider);
     try {
       this.bits = bitsProvider.get(base);
     } catch (IOException ex) {
@@ -49,7 +51,8 @@ public class FilteredSegmentReader extends FilteredIndexReader {
    * @return the wrapped index reader
    */
   protected IndexReader wrap(final IndexReader target) {
-    return new FilteredSegmentReader(target, this.getBitsProvider());
+    return new FilteredSegmentReader(
+        target, this.getBitsProvider(), this.getCacheKeyProvider());
   }
 
 

@@ -20,7 +20,7 @@ import java.io.IOException;
 public class FilteredMultiReader extends FilteredIndexReader {
 
   /**
-   * Subreaders.
+   * Sub-readers.
    */
   private final FilteredIndexReader[] subReaders;
 
@@ -35,10 +35,12 @@ public class FilteredMultiReader extends FilteredIndexReader {
    * Creates a filtered index reader with the given bits provider.
    * @param base         the underlying reader.
    * @param bitsProvider the provider of filter bits.
+   * @param cacheKeyProvider provider of cache keys.
    */
   public FilteredMultiReader(final IndexReader base,
-                             final BitsProvider bitsProvider) {
-    super(base, bitsProvider);
+                             final BitsProvider bitsProvider,
+                             final CacheKeyProvider cacheKeyProvider) {
+    super(base, bitsProvider, cacheKeyProvider);
 
     this.subReaders = new FilteredIndexReader[
         base.getSequentialSubReaders().length];
@@ -49,7 +51,8 @@ public class FilteredMultiReader extends FilteredIndexReader {
     int maxDoc = 0;
     for (IndexReader reader : base.getSequentialSubReaders()) {
       this.starts[pos] = maxDoc;
-      this.subReaders[pos] = FilteredIndexReader.wrap(reader, bitsProvider);
+      this.subReaders[pos] = FilteredIndexReader.wrap(
+          reader, bitsProvider, cacheKeyProvider);
       maxDoc += this.subReaders[pos].maxDoc();
       pos++;
     }
@@ -60,7 +63,8 @@ public class FilteredMultiReader extends FilteredIndexReader {
 
   @Override
   protected IndexReader wrap(final IndexReader target) {
-    return new FilteredMultiReader(target, this.getBitsProvider());
+    return new FilteredMultiReader(
+        target, this.getBitsProvider(), this.getCacheKeyProvider());
   }
 
 
