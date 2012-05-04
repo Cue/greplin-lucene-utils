@@ -9,7 +9,6 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanFilter;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FilterClause;
-import org.apache.lucene.search.TermsFilter;
 
 import javax.annotation.Nullable;
 
