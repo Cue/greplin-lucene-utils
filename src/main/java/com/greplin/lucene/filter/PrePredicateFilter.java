@@ -53,6 +53,27 @@ public class PrePredicateFilter extends Filter {
 
 
   @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    PrePredicateFilter that = (PrePredicateFilter) o;
+    return this.filter.equals(that.filter)
+        && this.predicate.equals(that.predicate);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(this.filter, this.predicate);
+  }
+
+
+  @Override
   public String toString() {
     return Objects.toStringHelper(PrePredicateFilter.class)
         .add("filter", this.filter)
