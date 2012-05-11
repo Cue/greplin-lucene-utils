@@ -43,7 +43,9 @@ public final class FilterBitsProvider extends BitsProvider {
   public Bits get(final IndexReader reader) throws IOException {
     DocIdSet docIdSet = this.filter.getDocIdSet(reader);
 
-    if (docIdSet instanceof Bits && docIdSet.isCacheable()) {
+    if (docIdSet == null) {
+      return new Bits.MatchNoBits(reader.maxDoc());
+    } else if (docIdSet instanceof Bits && docIdSet.isCacheable()) {
       return (Bits) docIdSet;
     } else {
       FixedBitSet result = new FixedBitSet(reader.maxDoc());
