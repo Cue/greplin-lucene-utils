@@ -9,6 +9,7 @@ import org.apache.commons.collections.primitives.IntList;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
+import org.apache.lucene.search.FilteredDocIdSet;
 import org.apache.lucene.util.FixedBitSet;
 
 import javax.annotation.Nullable;
@@ -81,6 +82,37 @@ public final class DocIdSets {
         return new IntListDocIdSet(docIds);
       }
     }
+  }
+
+
+  /**
+   * Filters another DocIdSet to remove deleted documents.
+   */
+  public static final class RemoveDeletedDocuments extends FilteredDocIdSet {
+
+    /**
+     * The IndexReader the docIdSet is built on.
+     */
+    private final IndexReader reader;
+
+
+    /**
+     * Creates a new deletion removing doc id set.
+     * @param innerSet the set to filter
+     * @param reader the reader
+     */
+    public RemoveDeletedDocuments(final DocIdSet innerSet,
+                                  final IndexReader reader) {
+      super(innerSet);
+      this.reader = reader;
+    }
+
+
+    @Override
+    protected boolean match(final int docId) throws IOException {
+      return !this.reader.isDeleted(docId);
+    }
+
   }
 
 }
