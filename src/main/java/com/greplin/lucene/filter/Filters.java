@@ -4,13 +4,16 @@
 
 package com.greplin.lucene.filter;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanFilter;
+import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FilterClause;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 
 /**
  * Static utility methods for Filters.
@@ -19,6 +22,17 @@ public final class Filters {
 
   /** Not instantiable. */
   private Filters() { }
+
+
+  /**
+   * Filter that matches all documents.
+   */
+  public static final Filter MATCH_ALL = new Filter() {
+    @Override
+    public DocIdSet getDocIdSet(final IndexReader reader) throws IOException {
+      return new AllDocSet(reader.maxDoc());
+    }
+  };
 
 
   /**
