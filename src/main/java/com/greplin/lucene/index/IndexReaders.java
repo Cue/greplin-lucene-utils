@@ -27,10 +27,17 @@ public final class IndexReaders {
    */
   public static List<IndexReader> gatherSubReaders(
       final IndexReader... readers) {
+    if (readers.length == 1 && readers[0] instanceof GatheredSubReaders) {
+      return ((GatheredSubReaders) readers[0]).gatherSubReaders();
+    }
     List<IndexReader> result = Lists.newArrayList();
     for (IndexReader reader : readers) {
       if (reader != null) {
-        ReaderUtil.gatherSubReaders(result, reader);
+        if (reader instanceof GatheredSubReaders) {
+          result.addAll(((GatheredSubReaders) reader).gatherSubReaders());
+        } else {
+          ReaderUtil.gatherSubReaders(result, reader);
+        }
       }
     }
     return result;
