@@ -97,4 +97,16 @@ public final class FixedBitSets {
     return ints;
   }
 
+
+  /**
+   * Creates a bitset that includes all docs from the given reader.
+   * @param reader the index
+   * @return a bitset that includes all docs
+   */
+  public static FixedBitSet all(final IndexReader reader) {
+    FixedBitSet result = new FixedBitSet(reader.maxDoc());
+    result.set(0, reader.maxDoc());
+    return result;
+  }
+
 }
