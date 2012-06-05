@@ -4,6 +4,7 @@
 
 package com.greplin.lucene.index;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.util.ReaderUtil;
@@ -28,7 +29,9 @@ public final class IndexReaders {
   public static List<IndexReader> gatherSubReaders(
       final IndexReader... readers) {
     if (readers.length == 1 && readers[0] instanceof GatheredSubReaders) {
-      return ((GatheredSubReaders) readers[0]).gatherSubReaders();
+      List<IndexReader> gathered =
+          ((GatheredSubReaders) readers[0]).gatherSubReaders();
+      return gathered == null ? ImmutableList.of(readers[0]) : gathered;
     }
     List<IndexReader> result = Lists.newArrayList();
     for (IndexReader reader : readers) {
