@@ -34,7 +34,13 @@ public final class IndexReaders {
     for (IndexReader reader : readers) {
       if (reader != null) {
         if (reader instanceof GatheredSubReaders) {
-          result.addAll(((GatheredSubReaders) reader).gatherSubReaders());
+          List<IndexReader> gathered =
+              ((GatheredSubReaders) reader).gatherSubReaders();
+          if (gathered == null) {
+            result.add(reader);
+          } else {
+            result.addAll(gathered);
+          }
         } else {
           ReaderUtil.gatherSubReaders(result, reader);
         }
