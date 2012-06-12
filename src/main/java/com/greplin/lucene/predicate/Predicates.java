@@ -125,4 +125,36 @@ public final class Predicates {
 
   }
 
+
+  /**
+   * Predicate that matches no documents.
+   */
+  public static final BitsProvider NONE = new BitsProvider() {
+    @Override
+    public Bits get(final IndexReader reader) throws IOException {
+      return new Predicate() {
+        @Override
+        public boolean get(final int index) {
+          return false;
+        }
+      };
+    }
+  };
+
+
+  /**
+   * Predicate that matches all documents.
+   */
+  public static final BitsProvider ALL = new BitsProvider() {
+    @Override
+    public Bits get(final IndexReader reader) throws IOException {
+      return new Predicate() {
+        @Override
+        public boolean get(final int index) {
+          return true;
+        }
+      };
+    }
+  };
+
 }
