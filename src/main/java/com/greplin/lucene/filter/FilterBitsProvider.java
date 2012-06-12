@@ -74,4 +74,10 @@ public final class FilterBitsProvider extends BitsProvider {
     return this.filter.hashCode();
   }
 
+
+  @Override
+  public String toString() {
+    return this.filter.toString();
+  }
+
 }
