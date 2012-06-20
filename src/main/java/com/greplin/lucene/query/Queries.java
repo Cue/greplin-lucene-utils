@@ -61,6 +61,9 @@ public final class Queries {
    */
   public static PhraseQuery phraseFor(
       final Analyzer analyzer, final String field, final String query) {
+    if (query == null) {
+      return null;
+    }
     TokenStream tokens = analyzer.tokenStream("", new StringReader(query));
     PhraseQuery phrase = new PhraseQuery();
     try {
