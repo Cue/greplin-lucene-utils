@@ -40,6 +40,19 @@ public class TermsFilter extends Filter {
 
 
   /**
+   * Creates a TermsFilter composed from multiple terms.
+   * @param terms the terms to add to the filter.
+   * @return the new TermsFilter.
+   */
+  public static TermsFilter from(final Term ... terms) {
+    TermsFilter filter = new TermsFilter();
+    for (Term term : terms) {
+      filter.addTerm(term);
+    }
+    return filter;
+  }
+
+  /**
    * Adds a term to the list of acceptable terms.
    * @param term the term to add.
    */
