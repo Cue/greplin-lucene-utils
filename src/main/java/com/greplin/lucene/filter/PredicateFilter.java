@@ -36,6 +36,8 @@ public class PredicateFilter extends Filter {
    * @param predicate the predicate.
    */
   public PredicateFilter(final Filter filter, final BitsProvider predicate) {
+    assert filter != null;
+    assert predicate != null;
     this.filter = filter;
     this.predicate = predicate;
   }
