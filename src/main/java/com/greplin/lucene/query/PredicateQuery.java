@@ -8,6 +8,7 @@ import com.google.common.base.Objects;
 import com.greplin.lucene.predicate.BitsProvider;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Query;
@@ -27,6 +28,16 @@ import java.util.Set;
  * Based on {@link org.apache.lucene.search.CachingWrapperFilter}.
  */
 public class PredicateQuery extends Query {
+
+  /**
+   * Double the standard max-clause count for BooleanQueries (1024) since it is
+   * often too low for large rewrites.
+   */
+  private static final int MAX_CLAUSE_COUNT = 2048;
+
+  static {
+    BooleanQuery.setMaxClauseCount(MAX_CLAUSE_COUNT);
+  }
 
   /**
    * The underlying query.
