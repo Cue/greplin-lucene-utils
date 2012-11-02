@@ -18,6 +18,7 @@ package com.greplin.lucene.query;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 /**
@@ -108,6 +109,6 @@ public class BooleanQueryBuilder {
    *     the given query
    */
   public static BooleanQuery not(final Query query) {
-    return builder().mustNot(query).build();
+    return builder().should(new MatchAllDocsQuery()).mustNot(query).build();
   }
 }
