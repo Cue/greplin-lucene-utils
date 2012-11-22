@@ -89,6 +89,12 @@ public final class Predicates {
       return new InverseBits(this.original.get(reader));
     }
 
+
+    @Override
+    public String toString() {
+      return "-(" + this.original.toString() + ")";
+    }
+
   }
 
 
