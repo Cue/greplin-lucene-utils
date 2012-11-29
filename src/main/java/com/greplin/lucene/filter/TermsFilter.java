@@ -30,6 +30,9 @@ import java.util.Set;
 
 /**
  * Constructs a filter for docs matching any of the terms added to this class.
+ *
+ * Similar to {@link org.apache.lucene.search.TermsFilter} but has a much
+ * better toString().
  */
 public class TermsFilter extends Filter {
 
