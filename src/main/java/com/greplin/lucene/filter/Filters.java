@@ -97,7 +97,7 @@ public final class Filters {
 
   /**
    * Returns a filter matching the inverse of the given filter.
-   * @param filter the filter to return the opposite ofnegate
+   * @param filter the filter to return the opposite of
    * @return the negated filter
    */
   public static Filter not(final Filter filter) {
