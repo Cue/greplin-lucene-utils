@@ -109,4 +109,21 @@ public final class FixedBitSets {
     return result;
   }
 
+
+  /**
+   * Gets the bit at the given index, or returns defaultValue if the index is
+   * outside the bounds of the given bitset.
+   * @param bitSet the bit set to get from
+   * @param index the index in the bit set
+   * @param defaultValue the value to return if the index is outside the
+   *     bounds of the bitset
+   * @return the bit at the given index, or defaultValue if the index is
+   *     outside the bounds of the bitset
+   */
+  public static boolean unboundedGet(
+      final FixedBitSet bitSet, final int index, final boolean defaultValue) {
+    return (index < bitSet.length() && index >= 0)
+        ? bitSet.get(index) : defaultValue;
+  }
+
 }
