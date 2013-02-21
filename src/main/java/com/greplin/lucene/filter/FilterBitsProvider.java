@@ -7,6 +7,7 @@ package com.greplin.lucene.filter;
 import com.greplin.lucene.predicate.BitsProvider;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.DocIdSet;
+import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.FixedBitSet;
@@ -49,7 +50,10 @@ public final class FilterBitsProvider extends BitsProvider {
       return (Bits) docIdSet;
     } else {
       FixedBitSet result = new FixedBitSet(reader.maxDoc());
-      result.or(docIdSet.iterator());
+      DocIdSetIterator iterator = docIdSet.iterator();
+      if (iterator != null) {
+        result.or(iterator);
+      }
       return result;
     }
   }
