@@ -52,4 +52,25 @@ public final class IndexReaders {
     return result;
   }
 
+
+  /**
+   * Gets the sub-reader and the offset within that reader
+   * of the given global document id.
+   * @param reader the main reader
+   * @param docId offset within that reader
+   * @return the sub-reader and offset
+   */
+  public static ReaderAndOffset getReaderAndOffset(
+      final IndexReader reader, final int docId) {
+    int pos = 0;
+    for (IndexReader subReader : gatherSubReaders(reader)) {
+      if (pos + subReader.maxDoc() > docId) {
+        return new ReaderAndOffset(subReader, docId - pos);
+      } else {
+        pos += subReader.maxDoc();
+      }
+    }
+    return null;
+  }
+
 }
