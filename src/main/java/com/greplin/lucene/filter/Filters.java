@@ -14,6 +14,7 @@ import org.apache.lucene.search.FilterClause;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Static utility methods for Filters.
@@ -36,32 +37,45 @@ public final class Filters {
 
 
   /**
+     * Returns a filter that allows documents that match any constituent
+     * filter.  For convenience, null values are accepted and ignored.  If
+     * all values are null, null will be returned.
+     * @param filters the filters to combine
+     * @return the combined filter
+     */
+    @Nullable public static Filter or(final Iterable<Filter> filters) {
+      final BooleanFilter booleanFilter = new BooleanFilter();
+
+      Filter lastFilter = null;
+      int count = 0;
+      for (Filter filter : filters) {
+        if (filter != null) {
+          booleanFilter.add(new FilterClause(
+              filter, BooleanClause.Occur.SHOULD));
+          count += 1;
+          lastFilter = filter;
+        }
+      }
+
+      if (count == 0) {
+        return null;
+      } else if (count == 1) {
+        return lastFilter;
+      } else {
+        return booleanFilter;
+      }
+    }
+
+
+  /**
    * Returns a filter that allows documents that match any constituent
    * filter.  For convenience, null values are accepted and ignored.  If
    * all values are null, null will be returned.
    * @param filters the filters to combine
    * @return the combined filter
    */
-  @Nullable public static Filter or(@Nullable final Filter... filters) {
-    final BooleanFilter booleanFilter = new BooleanFilter();
-
-    Filter lastFilter = null;
-    int count = 0;
-    for (Filter filter : filters) {
-      if (filter != null) {
-        booleanFilter.add(new FilterClause(filter, BooleanClause.Occur.SHOULD));
-        count += 1;
-        lastFilter = filter;
-      }
-    }
-
-    if (count == 0) {
-      return null;
-    } else if (count == 1) {
-      return lastFilter;
-    } else {
-      return booleanFilter;
-    }
+  @Nullable public static Filter or(final Filter... filters) {
+    return or(Arrays.asList(filters));
   }
 
 
@@ -72,7 +86,7 @@ public final class Filters {
    * @param filters the filters to combine
    * @return the combined filter
    */
-  @Nullable public static Filter and(@Nullable final Filter... filters) {
+  @Nullable public static Filter and(final Iterable<Filter> filters) {
     final BooleanFilter booleanFilter = new BooleanFilter();
 
     Filter lastFilter = null;
@@ -96,6 +110,18 @@ public final class Filters {
 
 
   /**
+   * Returns a filter that allows documents that match every constituent
+   * filter.  For convenience, null values are accepted and ignored.  If
+   * all values are null, null will be returned.
+   * @param filters the filters to combine
+   * @return the combined filter
+   */
+  @Nullable public static Filter and(final Filter... filters) {
+    return and(Arrays.asList(filters));
+  }
+
+
+  /**
    * Returns a filter matching the inverse of the given filter.
    * @param filter the filter to return the opposite of
    * @return the negated filter
@@ -112,12 +138,21 @@ public final class Filters {
    * @param terms the terms to match
    * @return the terms filter
    */
-  public static TermsFilter terms(final Term... terms) {
+  public static TermsFilter terms(final Iterable<Term> terms) {
     TermsFilter result = new TermsFilter();
     for (Term term : terms) {
       result.addTerm(term);
     }
     return result;
+  }
+
+  /**
+   * Returns a terms filter matching the given terms.
+   * @param terms the terms to match
+   * @return the terms filter
+   */
+  public static TermsFilter terms(final Term... terms) {
+    return terms(Arrays.asList(terms));
   }
 
 }
