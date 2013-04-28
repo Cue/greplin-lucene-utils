@@ -56,7 +56,7 @@ public class TermsForField implements Iterable<Term> {
    */
   private boolean isField(@Nullable final Term term) {
     // It's OK to use == because of interning.
-    return term != null && term.field() == fieldName;
+    return term != null && term.field() == this.fieldName;
 
   }
 
@@ -84,25 +84,25 @@ public class TermsForField implements Iterable<Term> {
     private TermsForFieldIterator() throws IOException {
       this.terms = TermsForField.this.indexReader.terms(
           new Term(TermsForField.this.fieldName));
-      nextValue = this.terms == null || !isField(this.terms.term())
+      this.nextValue = this.terms == null || !isField(this.terms.term())
           ? null : this.terms.term();
     }
 
 
     @Override
     public boolean hasNext() {
-      return nextValue != null;
+      return this.nextValue != null;
     }
 
 
     @Override
     public Term next() {
-      Term result = nextValue;
+      Term result = this.nextValue;
       try {
-        if (this.terms.next() && isField(terms.term())) {
-          nextValue = terms.term();
+        if (this.terms.next() && isField(this.terms.term())) {
+          this.nextValue = this.terms.term();
         } else {
-          nextValue = null;
+          this.nextValue = null;
           this.terms.close();
         }
       } catch (IOException e) {
@@ -145,7 +145,7 @@ public class TermsForField implements Iterable<Term> {
      * @return the underlying exception
      */
     public IOException getIOException() {
-      return ioException;
+      return this.ioException;
     }
 
   }

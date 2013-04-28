@@ -122,7 +122,7 @@ public final class MatchNoDocsQuery extends Query {
     public Scorer scorer(final IndexReader reader,
                          final boolean scoreDocsInOrder,
                          final boolean topScorer) throws IOException {
-      return new MatchNothingScorer(similarity);
+      return new MatchNothingScorer(this.similarity);
     }
 
     @Override

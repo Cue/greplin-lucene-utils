@@ -35,12 +35,12 @@ public class CountingCollector extends UnorderedCollector {
    * @return the result count
    */
   public final int getCount() {
-    return count;
+    return this.count;
   }
 
   @Override
   public final void collect(final int doc) throws IOException {
-    count++;
+    this.count++;
   }
 
   @Override

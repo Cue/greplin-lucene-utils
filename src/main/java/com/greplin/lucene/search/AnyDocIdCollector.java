@@ -20,14 +20,14 @@ public class AnyDocIdCollector extends UnorderedCollector {
    * @return the first matched document id, or null if none matched
    */
   public final Integer getHit() {
-    return hit;
+    return this.hit;
   }
 
 
   @Override
   public final void collect(final int doc) throws IOException {
-    if (hit == null) {
-      hit = getCurrentDocBase() + doc;
+    if (this.hit == null) {
+      this.hit = getCurrentDocBase() + doc;
     }
   }
 }

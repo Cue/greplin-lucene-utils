@@ -36,7 +36,7 @@ public class HasFieldFilterTest extends BaseFilterTest {
     doc2.add(new Field("field2", "2", Field.Store.YES, Field.Index.ANALYZED));
     w.addDocument(doc2);
 
-    reader = createReader(w);
+    this.reader = createReader(w);
   }
 
 
@@ -45,10 +45,10 @@ public class HasFieldFilterTest extends BaseFilterTest {
     Filter field1 = new HasFieldFilter("field1");
     Filter field2 = new HasFieldFilter("field2");
 
-    DocIdSet hasField1 = field1.getDocIdSet(reader);
+    DocIdSet hasField1 = field1.getDocIdSet(this.reader);
     Assert.assertTrue(hasField1.isCacheable());
 
-    DocIdSet hasField2 = field2.getDocIdSet(reader);
+    DocIdSet hasField2 = field2.getDocIdSet(this.reader);
     Assert.assertTrue(hasField2.isCacheable());
 
     assertDocIds(hasField1, true, false);

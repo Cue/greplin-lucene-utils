@@ -51,14 +51,14 @@ public class TermsForFieldTest {
 
     w.close();
 
-    reader = IndexReader.open(d);
+    this.reader = IndexReader.open(d);
   }
 
 
   @Test
   public void testStoredAndIndexed() throws Exception {
     List<Term> terms = ImmutableList.copyOf(
-        new TermsForField(reader, "stored"));
+        new TermsForField(this.reader, "stored"));
     Assert.assertEquals(
         ImmutableList.of(
             new Term("stored", "1"),
@@ -71,7 +71,7 @@ public class TermsForFieldTest {
   @Test
   public void testIndexed() throws Exception {
     List<Term> terms = ImmutableList.copyOf(
-        new TermsForField(reader, "notStored"));
+        new TermsForField(this.reader, "notStored"));
     Assert.assertEquals(
         ImmutableList.of(
             new Term("notStored", "a"),
@@ -83,7 +83,7 @@ public class TermsForFieldTest {
   @Test
   public void testUnindexed() throws Exception {
     List<Term> terms = ImmutableList.copyOf(
-        new TermsForField(reader, "noIndex"));
+        new TermsForField(this.reader, "noIndex"));
     Assert.assertEquals(Collections.<Term>emptyList(), terms);
   }
 
@@ -91,7 +91,7 @@ public class TermsForFieldTest {
   @Test
   public void testNonexistent() throws Exception {
     List<Term> terms = ImmutableList.copyOf(
-        new TermsForField(reader, "redherring"));
+        new TermsForField(this.reader, "redherring"));
     Assert.assertEquals(Collections.<Term>emptyList(), terms);
   }
 }

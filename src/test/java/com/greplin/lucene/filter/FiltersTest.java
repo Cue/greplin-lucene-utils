@@ -40,12 +40,12 @@ public class FiltersTest extends BaseFilterTest {
   @Test
   public void testNot() throws Exception {
     Filter dog = TermsFilter.from(new Term("f", "dog"));
-    assertDocIds(dog.getDocIdSet(reader), true, true);
-    assertDocIds(Filters.not(dog).getDocIdSet(reader), false, false);
+    assertDocIds(dog.getDocIdSet(this.reader), true, true);
+    assertDocIds(Filters.not(dog).getDocIdSet(this.reader), false, false);
 
     Filter cat = TermsFilter.from(new Term("f", "cat"));
-    assertDocIds(cat.getDocIdSet(reader), true, false);
-    assertDocIds(Filters.not(cat).getDocIdSet(reader), false, true);
+    assertDocIds(cat.getDocIdSet(this.reader), true, false);
+    assertDocIds(Filters.not(cat).getDocIdSet(this.reader), false, true);
   }
 
 }

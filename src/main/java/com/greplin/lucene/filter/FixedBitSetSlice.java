@@ -34,7 +34,7 @@ public class FixedBitSetSlice extends DocIdSetSlice {
    * @return the underlying FixedBitSet
    */
   public FixedBitSet getUnderlying() {
-    return underlying;
+    return this.underlying;
   }
 
 

@@ -35,14 +35,14 @@ public class AnyMatchCollector extends UnorderedCollector {
    * @return the first matched document, or null if none matched
    */
   public final Document getHit() {
-    return hit;
+    return this.hit;
   }
 
 
   @Override
   public final void collect(final int doc) throws IOException {
-    if (hit == null) {
-      hit = getCurrentReader().document(doc);
+    if (this.hit == null) {
+      this.hit = getCurrentReader().document(doc);
     }
   }
 }

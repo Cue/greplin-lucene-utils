@@ -28,8 +28,8 @@ public abstract class BaseCollector extends Collector {
   public void setNextReader(final IndexReader reader,
                             final int docBase)
       throws IOException {
-    currentDocBase = docBase;
-    currentReader = reader;
+    this.currentDocBase = docBase;
+    this.currentReader = reader;
   }
 
 
@@ -38,7 +38,7 @@ public abstract class BaseCollector extends Collector {
    * @return the current index reader
    */
   protected IndexReader getCurrentReader() {
-    return currentReader;
+    return this.currentReader;
   }
 
 
@@ -47,6 +47,6 @@ public abstract class BaseCollector extends Collector {
    * @return the current document offset.
    */
   protected int getCurrentDocBase() {
-    return currentDocBase;
+    return this.currentDocBase;
   }
 }

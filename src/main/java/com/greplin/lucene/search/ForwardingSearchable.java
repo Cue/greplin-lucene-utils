@@ -42,31 +42,31 @@ public class ForwardingSearchable implements Searchable {
   public void search(final Weight weight,
                      final Filter filter,
                      final Collector results) throws IOException {
-    searcher.search(weight, filter, results);
+    this.searcher.search(weight, filter, results);
   }
 
 
   @Override
   public void close() throws IOException {
-    searcher.close();
+    this.searcher.close();
   }
 
 
   @Override
   public int docFreq(final Term term) throws IOException {
-    return searcher.docFreq(term);
+    return this.searcher.docFreq(term);
   }
 
 
   @Override
   public int[] docFreqs(final Term[] terms) throws IOException {
-    return searcher.docFreqs(terms);
+    return this.searcher.docFreqs(terms);
   }
 
 
   @Override
   public int maxDoc() throws IOException {
-    return searcher.maxDoc();
+    return this.searcher.maxDoc();
   }
 
 
@@ -74,33 +74,33 @@ public class ForwardingSearchable implements Searchable {
   public TopDocs search(final Weight weight,
                         final Filter filter,
                         final int n) throws IOException {
-    return searcher.search(weight, filter, n);
+    return this.searcher.search(weight, filter, n);
   }
 
 
   @Override
   public Document doc(final int i) throws IOException {
-    return searcher.doc(i);
+    return this.searcher.doc(i);
   }
 
 
   @Override
   public Document doc(final int docid,
                       final FieldSelector fieldSelector) throws IOException {
-    return searcher.doc(docid, fieldSelector);
+    return this.searcher.doc(docid, fieldSelector);
   }
 
 
   @Override
   public Query rewrite(final Query query) throws IOException {
-    return searcher.rewrite(query);
+    return this.searcher.rewrite(query);
   }
 
 
   @Override
   public Explanation explain(final Weight weight,
                              final int doc) throws IOException {
-    return searcher.explain(weight, doc);
+    return this.searcher.explain(weight, doc);
   }
 
 
@@ -109,6 +109,6 @@ public class ForwardingSearchable implements Searchable {
                              final Filter filter,
                              final int n,
                              final Sort sort) throws IOException {
-    return searcher.search(weight, filter, n, sort);
+    return this.searcher.search(weight, filter, n, sort);
   }
 }

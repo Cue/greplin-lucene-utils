@@ -54,86 +54,86 @@ public class ForwardingIndexReader extends IndexReader {
 
   @Override
   public int getRefCount() {
-    return delegate.getRefCount();
+    return this.delegate.getRefCount();
   }
 
 
   @Override
   public void incRef() {
-    delegate.incRef();
+    this.delegate.incRef();
   }
 
 
   @Override
   public void decRef() throws IOException {
-    delegate.decRef();
+    this.delegate.decRef();
   }
 
 
   @Override
   public IndexReader reopen() throws IOException {
-    return delegate.reopen();
+    return this.delegate.reopen();
   }
 
 
   @Override
   public IndexReader reopen(final boolean openReadOnly) throws IOException {
-    return delegate.reopen(openReadOnly);
+    return this.delegate.reopen(openReadOnly);
   }
 
 
   @Override
   public IndexReader reopen(final IndexCommit commit) throws IOException {
-    return delegate.reopen(commit);
+    return this.delegate.reopen(commit);
   }
 
 
   @Override
   public Object clone() {
-    return delegate.clone();
+    return this.delegate.clone();
   }
 
 
   @Override
   public IndexReader clone(final boolean openReadOnly) throws IOException {
-    return delegate.clone(openReadOnly);
+    return this.delegate.clone(openReadOnly);
   }
 
 
   @Override
   public Directory directory() {
-    return delegate.directory();
+    return this.delegate.directory();
   }
 
 
   @Override
   public long getVersion() {
-    return delegate.getVersion();
+    return this.delegate.getVersion();
   }
 
 
   @Override
   public Map<String, String> getCommitUserData() {
-    return delegate.getCommitUserData();
+    return this.delegate.getCommitUserData();
   }
 
 
   @Override
   public boolean isCurrent() throws IOException {
-    return delegate.isCurrent();
+    return this.delegate.isCurrent();
   }
 
 
   @Override
   public boolean isOptimized() {
-    return delegate.isOptimized();
+    return this.delegate.isOptimized();
   }
 
 
   @Override
   public TermFreqVector[] getTermFreqVectors(final int docNumber)
       throws IOException {
-    return delegate.getTermFreqVectors(docNumber);
+    return this.delegate.getTermFreqVectors(docNumber);
   }
 
 
@@ -141,7 +141,7 @@ public class ForwardingIndexReader extends IndexReader {
   public TermFreqVector getTermFreqVector(final int docNumber,
                                           final String field)
       throws IOException {
-    return delegate.getTermFreqVector(docNumber, field);
+    return this.delegate.getTermFreqVector(docNumber, field);
   }
 
 
@@ -150,7 +150,7 @@ public class ForwardingIndexReader extends IndexReader {
                                 final String field,
                                 final TermVectorMapper mapper)
       throws IOException {
-    delegate.getTermFreqVector(docNumber, field, mapper);
+    this.delegate.getTermFreqVector(docNumber, field, mapper);
   }
 
 
@@ -158,31 +158,31 @@ public class ForwardingIndexReader extends IndexReader {
   public void getTermFreqVector(final int docNumber,
                                 final TermVectorMapper mapper)
       throws IOException {
-    delegate.getTermFreqVector(docNumber, mapper);
+    this.delegate.getTermFreqVector(docNumber, mapper);
   }
 
 
   @Override
   public int numDocs() {
-    return delegate.numDocs();
+    return this.delegate.numDocs();
   }
 
 
   @Override
   public int maxDoc() {
-    return delegate.maxDoc();
+    return this.delegate.maxDoc();
   }
 
 
   @Override
   public int numDeletedDocs() {
-    return delegate.numDeletedDocs();
+    return this.delegate.numDeletedDocs();
   }
 
 
   @Override
   public Document document(final int n) throws IOException {
-    return delegate.document(n);
+    return this.delegate.document(n);
   }
 
 
@@ -190,31 +190,31 @@ public class ForwardingIndexReader extends IndexReader {
   public Document document(final int n,
                            final FieldSelector fieldSelector)
       throws IOException {
-    return delegate.document(n, fieldSelector);
+    return this.delegate.document(n, fieldSelector);
   }
 
 
   @Override
   public boolean isDeleted(final int n) {
-    return delegate.isDeleted(n);
+    return this.delegate.isDeleted(n);
   }
 
 
   @Override
   public boolean hasDeletions() {
-    return delegate.hasDeletions();
+    return this.delegate.hasDeletions();
   }
 
 
   @Override
   public boolean hasNorms(final String field) throws IOException {
-    return delegate.hasNorms(field);
+    return this.delegate.hasNorms(field);
   }
 
 
   @Override
   public byte[] norms(final String field) throws IOException {
-    return delegate.norms(field);
+    return this.delegate.norms(field);
   }
 
 
@@ -222,7 +222,7 @@ public class ForwardingIndexReader extends IndexReader {
   public void norms(final String field,
                     final byte[] bytes,
                     final int offset) throws IOException {
-    delegate.norms(field, bytes, offset);
+    this.delegate.norms(field, bytes, offset);
   }
 
 
@@ -230,7 +230,7 @@ public class ForwardingIndexReader extends IndexReader {
   public void setNorm(final int doc,
                       final String field,
                       final byte value) throws IOException {
-    delegate.setNorm(doc, field, value);
+    this.delegate.setNorm(doc, field, value);
   }
 
 
@@ -247,55 +247,55 @@ public class ForwardingIndexReader extends IndexReader {
   public void setNorm(final int doc,
                       final String field,
                       final float value) throws IOException {
-    delegate.setNorm(doc, field, value);
+    this.delegate.setNorm(doc, field, value);
   }
 
 
   @Override
   public TermEnum terms() throws IOException {
-    return delegate.terms();
+    return this.delegate.terms();
   }
 
 
   @Override
   public TermEnum terms(final Term t) throws IOException {
-    return delegate.terms(t);
+    return this.delegate.terms(t);
   }
 
 
   @Override
   public int docFreq(final Term t) throws IOException {
-    return delegate.docFreq(t);
+    return this.delegate.docFreq(t);
   }
 
 
   @Override
   public TermDocs termDocs(final Term term) throws IOException {
-    return delegate.termDocs(term);
+    return this.delegate.termDocs(term);
   }
 
 
   @Override
   public TermDocs termDocs() throws IOException {
-    return delegate.termDocs();
+    return this.delegate.termDocs();
   }
 
 
   @Override
   public TermPositions termPositions(final Term term) throws IOException {
-    return delegate.termPositions(term);
+    return this.delegate.termPositions(term);
   }
 
 
   @Override
   public TermPositions termPositions() throws IOException {
-    return delegate.termPositions();
+    return this.delegate.termPositions();
   }
 
 
   @Override
   public void deleteDocument(final int docNum) throws IOException {
-    delegate.deleteDocument(docNum);
+    this.delegate.deleteDocument(docNum);
   }
 
 
@@ -308,13 +308,13 @@ public class ForwardingIndexReader extends IndexReader {
 
   @Override
   public int deleteDocuments(final Term term) throws IOException {
-    return delegate.deleteDocuments(term);
+    return this.delegate.deleteDocuments(term);
   }
 
 
   @Override
   public void undeleteAll() throws IOException {
-    delegate.undeleteAll();
+    this.delegate.undeleteAll();
   }
 
 
@@ -349,42 +349,42 @@ public class ForwardingIndexReader extends IndexReader {
 
   @Override
   public Collection<String> getFieldNames(final FieldOption fldOption) {
-    return delegate.getFieldNames(fldOption);
+    return this.delegate.getFieldNames(fldOption);
   }
 
 
   @Override
   public IndexCommit getIndexCommit() throws IOException {
-    return delegate.getIndexCommit();
+    return this.delegate.getIndexCommit();
   }
 
 
   @Override
   public IndexReader[] getSequentialSubReaders() {
-    return delegate.getSequentialSubReaders();
+    return this.delegate.getSequentialSubReaders();
   }
 
 
   @Override
   public Object getCoreCacheKey() {
-    return delegate.getCoreCacheKey();
+    return this.delegate.getCoreCacheKey();
   }
 
 
   @Override
   public Object getDeletesCacheKey() {
-    return delegate.getDeletesCacheKey();
+    return this.delegate.getDeletesCacheKey();
   }
 
 
   @Override
   public long getUniqueTermCount() throws IOException {
-    return delegate.getUniqueTermCount();
+    return this.delegate.getUniqueTermCount();
   }
 
 
   @Override
   public int getTermInfosIndexDivisor() {
-    return delegate.getTermInfosIndexDivisor();
+    return this.delegate.getTermInfosIndexDivisor();
   }
 }

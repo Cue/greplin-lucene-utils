@@ -51,15 +51,15 @@ public class AllDocSet extends DocIdSet {
 
     @Override
     public int docID() {
-      return curDoc;
+      return this.curDoc;
     }
 
     @Override
     public int nextDoc() throws IOException {
-      curDoc++;
+      this.curDoc++;
 
-      if (curDoc < maxDoc) {
-        return curDoc;
+      if (this.curDoc < AllDocSet.this.maxDoc) {
+        return this.curDoc;
       } else {
         return NO_MORE_DOCS;
       }
@@ -67,10 +67,10 @@ public class AllDocSet extends DocIdSet {
 
     @Override
     public int advance(final int target) throws IOException {
-      curDoc = target;
+      this.curDoc = target;
 
-      if (curDoc < maxDoc) {
-        return curDoc;
+      if (this.curDoc < AllDocSet.this.maxDoc) {
+        return this.curDoc;
       } else {
         return NO_MORE_DOCS;
       }

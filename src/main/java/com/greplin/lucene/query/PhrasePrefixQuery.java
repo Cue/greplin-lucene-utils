@@ -58,7 +58,7 @@ public class PhrasePrefixQuery extends Query {
    * @param word the word to add
    */
   public final void add(final String word) {
-    terms.add(word);
+    this.terms.add(word);
   }
 
   /**
@@ -66,7 +66,7 @@ public class PhrasePrefixQuery extends Query {
    * @return the field
    */
   public final String getField() {
-    return field;
+    return this.field;
   }
 
   /**
@@ -74,7 +74,7 @@ public class PhrasePrefixQuery extends Query {
    * @return the phrase terms
    */
   public final List<String> getTerms() {
-    return terms;
+    return this.terms;
   }
 
   @Override
@@ -85,7 +85,7 @@ public class PhrasePrefixQuery extends Query {
       buffer.append(":");
     }
     buffer.append('"');
-    buffer.append(Joiner.on(' ').join(terms));
+    buffer.append(Joiner.on(' ').join(this.terms));
     buffer.append("*\"");
     buffer.append(ToStringUtils.boost(getBoost()));
     return buffer.toString();
@@ -95,8 +95,8 @@ public class PhrasePrefixQuery extends Query {
   public final int hashCode() {
     return new HashCodeBuilder()
         .append(super.hashCode())
-        .append(field)
-        .append(terms)
+        .append(this.field)
+        .append(this.terms)
         .hashCode();
   }
 
@@ -113,8 +113,8 @@ public class PhrasePrefixQuery extends Query {
     }
     PhrasePrefixQuery other = (PhrasePrefixQuery) obj;
     return new EqualsBuilder()
-        .append(field, other.field)
-        .append(terms, other.terms)
+        .append(this.field, other.field)
+        .append(this.terms, other.terms)
         .isEquals();
   }
 
@@ -128,14 +128,14 @@ public class PhrasePrefixQuery extends Query {
    */
   private Term[] getPrefixTerms(final String prefix,
                                 final IndexReader reader) throws IOException {
-    TermEnum enumerator = reader.terms(new Term(field, prefix));
+    TermEnum enumerator = reader.terms(new Term(this.field, prefix));
     List<Term> terms = Lists.newArrayList();
     try {
       do {
         Term term = enumerator.term();
         if (term != null
             && term.text().startsWith(prefix)
-            && term.field().equals(field)) {
+            && term.field().equals(this.field)) {
           terms.add(term);
         } else {
           break;
@@ -153,14 +153,15 @@ public class PhrasePrefixQuery extends Query {
 
   @Override
   public final Query rewrite(final IndexReader reader) throws IOException {
-    Term[] prefixTerms = getPrefixTerms(terms.get(terms.size() - 1), reader);
+    Term[] prefixTerms = getPrefixTerms(
+        this.terms.get(this.terms.size() - 1), reader);
     if (prefixTerms == null) {
       return new MatchNoDocsQuery();
     }
 
     MultiPhraseQuery query = new MultiPhraseQuery();
-    for (int i = 0; i < terms.size() - 1; i++) {
-      query.add(new Term(field, terms.get(i)));
+    for (int i = 0; i < this.terms.size() - 1; i++) {
+      query.add(new Term(this.field, this.terms.get(i)));
     }
     query.add(prefixTerms);
     return query;

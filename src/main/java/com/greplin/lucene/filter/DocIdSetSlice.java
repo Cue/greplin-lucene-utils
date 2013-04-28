@@ -107,7 +107,7 @@ public class DocIdSetSlice extends DocIdSet {
    * @return the index into the underying DocIdSet where this slice begins.
    */
   public int getStart() {
-    return start;
+    return this.start;
   }
 
 
@@ -115,7 +115,7 @@ public class DocIdSetSlice extends DocIdSet {
    * @return the index into the underying DocIdSet where this slice ends.
    */
   public int getEnd() {
-    return end;
+    return this.end;
   }
 
 }

@@ -36,13 +36,13 @@ public class AllMatchCollector extends UnorderedCollector {
    * Creates a new all match collector.
    */
   public AllMatchCollector() {
-    docs = Lists.newLinkedList();
+    this.docs = Lists.newLinkedList();
   }
 
 
   @Override
   public final void collect(final int doc) throws IOException {
-    docs.add(getCurrentReader().document(doc));
+    this.docs.add(getCurrentReader().document(doc));
   }
 
 
@@ -51,7 +51,7 @@ public class AllMatchCollector extends UnorderedCollector {
    * @return list of all matching documents
    */
   public final List<Document> getMatches() {
-    return docs;
+    return this.docs;
   }
 
 }
