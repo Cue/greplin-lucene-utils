@@ -6,6 +6,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 
@@ -99,6 +100,21 @@ public final class Queries {
     } catch (IOException e) {
       return null;
     }
+  }
+
+
+  /**
+   * Returns a version of the given query that always matches with the
+   * given score.
+   * @param query the query
+   * @param score the desired score
+   * @return the constant score query
+   */
+  public static ConstantScoreQuery constantScore(
+      final Query query, final float score) {
+    ConstantScoreQuery result = new ConstantScoreQuery(query);
+    result.setBoost(score);
+    return result;
   }
 
 }
