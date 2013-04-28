@@ -44,7 +44,7 @@ public class BooleanQueryBuilder {
    * @param disableCoordination whether to disable score coordination
    */
   public BooleanQueryBuilder(final boolean disableCoordination) {
-    result = new BooleanQuery(disableCoordination);
+    this.result = new BooleanQuery(disableCoordination);
   }
 
 
@@ -58,11 +58,22 @@ public class BooleanQueryBuilder {
 
 
   /**
+   * Static method that returns a new query builder.
+   * @param disableCoordination whether to disable score coordination
+   * @return a new query builder
+   */
+  public static BooleanQueryBuilder builder(
+      final boolean disableCoordination) {
+    return new BooleanQueryBuilder(disableCoordination);
+  }
+
+
+  /**
    * Builds the query builder in to a BooleanQuery.
    * @return the built BooleanQuery
    */
   public final BooleanQuery build() {
-    return result;
+    return this.result;
   }
 
 
@@ -73,7 +84,7 @@ public class BooleanQueryBuilder {
    */
   public final BooleanQueryBuilder should(final Query query) {
     if (query != null) {
-      result.add(query, BooleanClause.Occur.SHOULD);
+      this.result.add(query, BooleanClause.Occur.SHOULD);
     }
     return this;
   }
@@ -85,7 +96,7 @@ public class BooleanQueryBuilder {
    */
   public final BooleanQueryBuilder must(final Query query) {
     if (query != null) {
-      result.add(query, BooleanClause.Occur.MUST);
+      this.result.add(query, BooleanClause.Occur.MUST);
     }
     return this;
   }
@@ -97,7 +108,7 @@ public class BooleanQueryBuilder {
    */
   public final BooleanQueryBuilder mustNot(final Query query) {
     if (query != null) {
-      result.add(query, BooleanClause.Occur.MUST_NOT);
+      this.result.add(query, BooleanClause.Occur.MUST_NOT);
     }
     return this;
   }
