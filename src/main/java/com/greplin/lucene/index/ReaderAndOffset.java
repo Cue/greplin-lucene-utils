@@ -14,6 +14,12 @@ public class ReaderAndOffset {
 
 
   /**
+   * The index in to the sub reader array where reader occurs.
+   */
+  private final int readerOffset;
+
+
+  /**
    * The offset of the document in the reader.
    */
   private final int offset;
@@ -22,10 +28,13 @@ public class ReaderAndOffset {
   /**
    * Creates a document position detail.
    * @param reader the reader
+   * @param readerOffset the index in to the sub readers where reader occurs
    * @param offset the offset in that reader
    */
-  public ReaderAndOffset(final IndexReader reader, final int offset) {
+  public ReaderAndOffset(
+      final IndexReader reader, final int readerOffset, final int offset) {
     this.reader = reader;
+    this.readerOffset = readerOffset;
     this.offset = offset;
   }
 
@@ -35,6 +44,14 @@ public class ReaderAndOffset {
    */
   public IndexReader getReader() {
     return this.reader;
+  }
+
+
+  /**
+   * @return the index in to the sub reader array where reader occurs
+   */
+  public int getReaderOffset() {
+    return this.readerOffset;
   }
 
 

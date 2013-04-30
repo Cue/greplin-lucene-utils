@@ -63,11 +63,13 @@ public final class IndexReaders {
   public static ReaderAndOffset getReaderAndOffset(
       final IndexReader reader, final int docId) {
     int pos = 0;
+    int index = 0;
     for (IndexReader subReader : gatherSubReaders(reader)) {
       if (pos + subReader.maxDoc() > docId) {
-        return new ReaderAndOffset(subReader, docId - pos);
+        return new ReaderAndOffset(subReader, index, docId - pos);
       } else {
         pos += subReader.maxDoc();
+        index++;
       }
     }
     return null;
