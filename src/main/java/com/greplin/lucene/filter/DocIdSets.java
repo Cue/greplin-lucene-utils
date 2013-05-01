@@ -86,6 +86,27 @@ public final class DocIdSets {
 
 
   /**
+   * Check if the given doc id set contains the given doc id.
+   * @param docIdSet the doc id set
+   * @param docId the doc id
+   * @return whether the given doc id set contains the given doc id
+   * @throws IOException if IO errors occur
+   */
+  public static boolean contains(
+      @Nullable final DocIdSet docIdSet, final int docId) throws IOException {
+    if (docIdSet == null) {
+      return false;
+    }
+
+    if (docIdSet instanceof FixedBitSet) {
+      return ((FixedBitSet) docIdSet).get(docId);
+    }
+
+    return docIdSet.iterator().advance(docId) == docId;
+  }
+
+
+  /**
    * Filters another DocIdSet to remove deleted documents.
    */
   public static final class RemoveDeletedDocuments extends FilteredDocIdSet {
