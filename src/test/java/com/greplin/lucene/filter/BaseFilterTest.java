@@ -5,6 +5,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.DocIdSet;
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.FixedBitSet;
@@ -35,6 +36,17 @@ public class BaseFilterTest {
     bitSet.or(d.iterator());
     for (int i = 0; i < bits.length; i++) {
       Assert.assertEquals("Should match expectation at index " + i, bits[i], bitSet.get(i));
+    }
+  }
+
+  protected static void assertFilterBitsEqual(IndexReader reader, Filter filter, boolean... expected)
+      throws IOException {
+    DocIdSet actual = filter.getDocIdSet(reader);
+    FixedBitSet actualBitSet = new FixedBitSet(expected.length);
+    actualBitSet.or(actual.iterator());
+
+    for (int i = 0; i < expected.length; i++) {
+      Assert.assertEquals("Expected same value at position " + i, expected[i], actualBitSet.get(i));
     }
   }
 

@@ -4,29 +4,12 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.search.DocIdSet;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.util.FixedBitSet;
-import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.IOException;
 
 /**
  * Tests for the prefix filter.
  */
 public class PrefixFilterTest extends BaseFilterTest {
-
-  private void assertFilterBitsEqual(IndexReader reader, Filter filter, boolean... expected)
-      throws IOException {
-    DocIdSet actual = filter.getDocIdSet(reader);
-    FixedBitSet actualBitSet = new FixedBitSet(expected.length);
-    actualBitSet.or(actual.iterator());
-
-    for (int i = 0; i < expected.length; i++) {
-      Assert.assertEquals("Expected same value at position " + i, expected[i], actualBitSet.get(i));
-    }
-  }
 
   @Test
   public void testBasics() throws Exception {
