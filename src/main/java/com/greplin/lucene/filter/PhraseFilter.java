@@ -7,11 +7,13 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.search.DocIdSet;
+import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.util.FixedBitSet;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.SortedSet;
 
 /**
@@ -52,10 +54,12 @@ public class PhraseFilter extends Filter {
 
   @Override
   public DocIdSet getDocIdSet(final IndexReader reader) throws IOException {
-    FixedBitSet result = new FixedBitSet(reader.maxDoc());
-    int readerOffset = 0;
+    List<IndexReader> subReaders = IndexReaders.gatherSubReaders(reader);
+    SimpleMatchList[] results = new SimpleMatchList[subReaders.size()];
+    int matchCount = 0;
+    int readerNumber = 0;
 
-    for (IndexReader subReader : IndexReaders.gatherSubReaders(reader)) {
+    for (IndexReader subReader : subReaders) {
       SortedSet<TermWithFrequency> termsOrderedByFrequency = Sets.newTreeSet();
       for (int i = 0; i < this.terms.length; i++) {
         Term t = new Term(this.field, this.terms[i]);
@@ -98,13 +102,131 @@ public class PhraseFilter extends Filter {
       }
 
       if (matches != null) {
-        for (int i = 0; i < matches.count; i++) {
-          result.set(matches.docIds[i] + readerOffset);
-        }
+        results[readerNumber] = matches;
+        matchCount += matches.count;
       }
-      readerOffset += subReader.maxDoc();
+      readerNumber++;
     }
-    return result;
+
+    final int bitsPerIntPowerLogTwo = 5; // 2^5 = 32
+    if (matchCount > reader.maxDoc() >> bitsPerIntPowerLogTwo) {
+      FixedBitSet result = new FixedBitSet(reader.maxDoc());
+      int readerOffset = 0;
+      for (int readerIndex = 0; readerIndex < results.length; readerIndex++) {
+        SimpleMatchList matches = results[readerIndex];
+        if (matches != null) {
+          for (int i = 0; i < matches.count; i++) {
+            result.set(matches.docIds[i] + readerOffset);
+          }
+        }
+        readerOffset += subReaders.get(readerIndex).maxDoc();
+      }
+      return result;
+    } else {
+      int[] result = new int[matchCount];
+      int base = 0;
+      int readerOffset = 0;
+      for (int readerIndex = 0; readerIndex < results.length; readerIndex++) {
+        SimpleMatchList matches = results[readerIndex];
+        if (matches != null) {
+          for (int i = 0; i < matches.count; i++) {
+            result[base + i] = matches.docIds[i] + readerOffset;
+          }
+          base += matches.count;
+        }
+        readerOffset += subReaders.get(readerIndex).maxDoc();
+      }
+      return new SortedIntArrayDocIdSet(result);
+    }
+  }
+
+
+  /**
+   * DocId set based on a sorted array of integers.
+   * The integer array is not defensively copied - so don't modify it!
+   */
+  private static final class SortedIntArrayDocIdSet extends DocIdSet {
+
+    /**
+     * The sorted array of integers.
+     */
+    private final int[] ints;
+
+
+    /**
+     * Constructs a new doc id set.
+     * @param ints sorted array of integers
+     */
+    private SortedIntArrayDocIdSet(final int[] ints) {
+      this.ints = ints;
+    }
+
+
+    @Override
+    public DocIdSetIterator iterator() throws IOException {
+      return new SortedIntArrayDocIdSetIterator(this.ints);
+    }
+
+
+    @Override
+    public boolean isCacheable() {
+      return true;
+    }
+
+  }
+
+
+  /**
+   * Iterator for sorted integer array.
+   */
+  private static final class SortedIntArrayDocIdSetIterator
+      extends DocIdSetIterator {
+
+    /**
+     * The list of integers.
+     */
+    private final int[] ints;
+
+    /**
+     * The active index.
+     */
+    private int index = -1;
+
+
+    /**
+     * Constructs an iterator over a sorted integer array.
+     * @param ints the array of integers
+     */
+    private SortedIntArrayDocIdSetIterator(final int[] ints) {
+      this.ints = ints;
+    }
+
+
+    @Override
+    public int docID() {
+      return this.ints[this.index];
+    }
+
+
+    @Override
+    public int nextDoc() throws IOException {
+      ++this.index;
+      return this.index < this.ints.length
+          ? this.ints[this.index] : NO_MORE_DOCS;
+    }
+
+
+    @Override
+    public int advance(final int target) throws IOException {
+      // TODO(robbyw): Consider doing binary search here.
+      // Though, in practice, the array is probably small enough that this
+      // would actually be slower.
+      while (docID() < target) {
+        nextDoc();
+      }
+      return docID();
+    }
+
   }
 
 
