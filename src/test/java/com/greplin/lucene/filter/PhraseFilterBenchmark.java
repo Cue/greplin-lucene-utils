@@ -27,7 +27,7 @@ public class PhraseFilterBenchmark {
 
   private static final Random RANDOM = new Random();
 
-  private static final int TOTAL_DOCS = 5000;
+  private static final int TOTAL_DOCS = 10000;
 
   private static final int AVERAGE_WORDS_PER_DOC = 100;
 
@@ -152,31 +152,40 @@ public class PhraseFilterBenchmark {
 
       for (int round = 0; round < ROUNDS; round++) {
         System.out.println();
+        String name1 = "filter";
+        String name2 = "query";
 
-        System.gc();
-        long millis = System.currentTimeMillis();
-        long hits = 0;
-        for (String[] queryWords : queries) {
-          PhraseFilter pf = new PhraseFilter(FIELD, queryWords);
-          hits += searcher.search(new FilteredQuery(new MatchAllDocsQuery(), pf), 1).totalHits;
-        }
-        long filterMs = System.currentTimeMillis() - millis;
-        System.out.println("Finished filter in " + filterMs + "ms with " + hits + " hits");
+        long ms1 = 0, ms2 = 0;
+        for (int step = 0; step < 2; step++) {
+          System.gc();
+          System.gc();
+          System.gc();
 
-        System.gc();
-        millis = System.currentTimeMillis();
-        hits = 0;
-        for (Term[] queryTerms : terms) {
-          PhraseQuery pq = new PhraseQuery();
-          for (Term term : queryTerms) {
-            pq.add(term);
+          if (step == (round & 1)) {
+            long millis = System.currentTimeMillis();
+            long hits = 0;
+            for (String[] queryWords : queries) {
+              PhraseFilter pf = new PhraseFilter(FIELD, queryWords);
+              hits += searcher.search(new FilteredQuery(new MatchAllDocsQuery(), pf), 1).totalHits;
+            }
+            ms1 = System.currentTimeMillis() - millis;
+            System.out.println("Finished " + name1 + " in " + ms1 + "ms with " + hits + " hits");
+          } else {
+            long millis = System.currentTimeMillis();
+            long hits = 0;
+            for (Term[] queryTerms : terms) {
+              PhraseQuery pq = new PhraseQuery();
+              for (Term term : queryTerms) {
+                pq.add(term);
+              }
+              hits += searcher.search(
+                  BooleanQueryBuilder.builder().must(new MatchAllDocsQuery()).must(pq).build(), 1).totalHits;
+            }
+            ms2 = System.currentTimeMillis() - millis;
+            System.out.println("Finished " + name2 + " in " + ms2 + "ms with " + hits + " hits");
           }
-          hits += searcher.search(
-              BooleanQueryBuilder.builder().must(new MatchAllDocsQuery()).must(pq).build(), 1).totalHits;
         }
-        long queryMs = System.currentTimeMillis() - millis;
-        System.out.println("Finished query in " + queryMs + "ms with " + hits + " hits");
-        System.out.println("Filter took " + (int) ((100.0 * filterMs) / queryMs) + "% as much time as the query");
+        System.out.println(name1 + " took " + (int) ((100.0 * ms1) / ms2) + "% as much time as " + name2);
       }
 
     } catch (IOException e) {

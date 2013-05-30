@@ -22,6 +22,9 @@ import java.util.SortedSet;
  * - supports a single field only
  * - does not compute score
  * - does not support slop
+ *
+ * Optimization notes:
+ * - Using a shared TermPositions with seeking saves about 10% !
  */
 public class PhraseFilter extends Filter {
 
