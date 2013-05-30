@@ -31,14 +31,18 @@ import java.util.SortedSet;
 public class PhraseFilter extends Filter {
 
   /**
-   * The field to find phrases in.
-   */
-  private final String field;
-
-  /**
    * The terms comprising the phrase.
    */
-  private final String[] terms;
+  private final Term[] terms;
+
+
+  /**
+   * Construct a new phrase filter.
+   * @param terms the terms in the phrase
+   */
+  public PhraseFilter(final Term... terms) {
+    this.terms = Arrays.copyOf(terms, terms.length);
+  }
 
 
   /**
@@ -47,8 +51,10 @@ public class PhraseFilter extends Filter {
    * @param terms the terms in the phrase
    */
   public PhraseFilter(final String field, final String... terms) {
-    this.field = field;
-    this.terms = Arrays.copyOf(terms, terms.length);
+    this.terms = new Term[terms.length];
+    for (int i = 0; i < terms.length; i++) {
+      this.terms[i] = new Term(field, terms[i]);
+    }
   }
 
 
@@ -62,7 +68,7 @@ public class PhraseFilter extends Filter {
     for (IndexReader subReader : subReaders) {
       SortedSet<TermWithFrequency> termsOrderedByFrequency = Sets.newTreeSet();
       for (int i = 0; i < this.terms.length; i++) {
-        Term t = new Term(this.field, this.terms[i]);
+        Term t = this.terms[i];
         termsOrderedByFrequency.add(
             new TermWithFrequency(t, subReader.docFreq(t), i));
       }
@@ -426,4 +432,3 @@ public class PhraseFilter extends Filter {
   }
 
 }
-
