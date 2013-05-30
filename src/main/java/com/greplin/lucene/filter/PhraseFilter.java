@@ -61,7 +61,8 @@ public class PhraseFilter extends Filter {
   @Override
   public DocIdSet getDocIdSet(final IndexReader reader) throws IOException {
     List<IndexReader> subReaders = IndexReaders.gatherSubReaders(reader);
-    SimpleMatchList[] results = new SimpleMatchList[subReaders.size()];
+    PhraseFilterMatchList[] results =
+        new PhraseFilterMatchList[subReaders.size()];
     int matchCount = 0;
     int readerNumber = 0;
 
@@ -73,7 +74,7 @@ public class PhraseFilter extends Filter {
             new TermWithFrequency(t, subReader.docFreq(t), i));
       }
 
-      SimpleMatchList matches = null;
+      PhraseFilterMatchList matches = null;
       TermPositions termPositions = subReader.termPositions();
       try {
         for (TermWithFrequency term : termsOrderedByFrequency) {
@@ -85,10 +86,10 @@ public class PhraseFilter extends Filter {
 
           if (matches == null) {
             // If this is the first term, collect all matches.
-            matches = new SimpleMatchList(term.docFreq);
+            matches = new PhraseFilterMatchList(term.docFreq);
             while (termPositions.next()) {
               int freq = termPositions.freq();
-              SimpleIntList list = new SimpleIntList(freq);
+              PhraseFilterIntList list = new PhraseFilterIntList(freq);
               for (int i = 0; i < freq; i++) {
                 list.add(termPositions.nextPosition() - term.offset);
               }
@@ -99,7 +100,7 @@ public class PhraseFilter extends Filter {
             matches.intersect(termPositions, term.offset);
           }
 
-          if (matches.count == 0) {
+          if (matches.getCount() == 0) {
             break;
           }
         }
@@ -109,7 +110,7 @@ public class PhraseFilter extends Filter {
 
       if (matches != null) {
         results[readerNumber] = matches;
-        matchCount += matches.count;
+        matchCount += matches.getCount();
       }
       readerNumber++;
     }
@@ -119,26 +120,32 @@ public class PhraseFilter extends Filter {
       FixedBitSet result = new FixedBitSet(reader.maxDoc());
       int readerOffset = 0;
       for (int readerIndex = 0; readerIndex < results.length; readerIndex++) {
-        SimpleMatchList matches = results[readerIndex];
+        PhraseFilterMatchList matches = results[readerIndex];
         if (matches != null) {
-          for (int i = 0; i < matches.count; i++) {
-            result.set(matches.docIds[i] + readerOffset);
+          int count = matches.getCount();
+          int[] docIds = matches.getDocIds();
+          for (int i = 0; i < count; i++) {
+            result.set(docIds[i] + readerOffset);
           }
         }
         readerOffset += subReaders.get(readerIndex).maxDoc();
       }
       return result;
+    } else if (matchCount == 0) {
+      return DocIdSets.EMPTY;
     } else {
       int[] result = new int[matchCount];
       int base = 0;
       int readerOffset = 0;
       for (int readerIndex = 0; readerIndex < results.length; readerIndex++) {
-        SimpleMatchList matches = results[readerIndex];
+        PhraseFilterMatchList matches = results[readerIndex];
         if (matches != null) {
-          for (int i = 0; i < matches.count; i++) {
-            result[base + i] = matches.docIds[i] + readerOffset;
+          int count = matches.getCount();
+          int[] docIds = matches.getDocIds();
+          for (int i = 0; i < count; i++) {
+            result[base + i] = docIds[i] + readerOffset;
           }
-          base += matches.count;
+          base += count;
         }
         readerOffset += subReaders.get(readerIndex).maxDoc();
       }
@@ -275,158 +282,6 @@ public class PhraseFilter extends Filter {
     public int compareTo(final TermWithFrequency o) {
       int first = Ints.compare(this.docFreq, o.docFreq);
       return first == 0 ? Ints.compare(this.offset, o.offset) : first;
-    }
-
-  }
-
-
-  /**
-   * Simple list of ints.  Can not grow beyond the initial capacity.
-   */
-  private static final class SimpleIntList {
-
-    /**
-     * The values.
-     */
-    private final int[] ints;
-
-    /**
-     * The number of values.
-     */
-    private int count;
-
-
-    /**
-     * Construct an empty list of ints with the given capacity.
-     * @param capacity the number of ints this list can store
-     */
-    private SimpleIntList(final int capacity) {
-      this.ints = new int[capacity];
-      this.count = 0;
-    }
-
-
-    /**
-     * Adds an int to the end of the array.
-     * @param item the item to add
-     */
-    private void add(final int item) {
-      this.ints[this.count++] = item;
-    }
-
-
-    /**
-     * Intersect this int list with the given positions.
-     * Modifies this list in place as an optimization.
-     * @param termPositions the term positions
-     * @param offset the offset of the term within the phrase
-     * @return whether this list has any terms remaining
-     * @throws IOException if IO problems occur within Lucene
-     */
-    private boolean intersect(
-        final TermPositions termPositions, final int offset)
-        throws IOException {
-      int otherCount = termPositions.freq();
-      int i = 0;
-      int j = 0;
-      int jValue = termPositions.nextPosition() - offset;
-      int resultCount = 0;
-      while (i < this.count && j < otherCount) {
-        if (this.ints[i] < jValue) {
-          i++;
-        } else {
-          if (this.ints[i] == jValue) {
-            this.ints[resultCount++] = this.ints[i];
-            i++;
-          }
-          j++;
-          if (j != otherCount) {
-            jValue = termPositions.nextPosition() - offset;
-          }
-        }
-      }
-      this.count = resultCount;
-      return resultCount != 0;
-    }
-
-  }
-
-
-  /**
-   * Simple list of matches.
-   */
-  private static final class SimpleMatchList {
-
-    /**
-     * Docs that match.
-     */
-    private final int[] docIds;
-
-    /**
-     * Collated with docIds, the positions that match for that doc.
-     */
-    private final SimpleIntList[] positions;
-
-    /**
-     * The number of matches.
-     * MUTABLE: for efficient in-place modification.
-     */
-    private int count;
-
-
-    /**
-     * Creates a match list with the given capacity.
-     * @param capacity the maximum number of matches we might find
-     */
-    private SimpleMatchList(final int capacity) {
-      this.docIds = new int[capacity];
-      this.positions = new SimpleIntList[capacity];
-      this.count = 0;
-    }
-
-
-    /**
-     * Adds a match.
-     * @param docId the doc that matched
-     * @param positions the positions it matched in
-     */
-    private void add(final int docId, final SimpleIntList positions) {
-      this.docIds[this.count] = docId;
-      this.positions[this.count++] = positions;
-    }
-
-
-    /**
-     * Intersects all doc/position pairs at the given offset with this match
-     * list.  Modifies this list in place as an optimization.
-     * @param termPositions the term positions enumerator
-     * @param offset the offset of the given term in the phrase
-     * @throws IOException if IO problems occur within Lucene
-     */
-    private void intersect(final TermPositions termPositions, final int offset)
-        throws IOException {
-      int currentDoc = -1;
-      int resultCount = 0;
-      for (int i = 0; i < this.count; i++) {
-        int docId = this.docIds[i];
-        while (currentDoc < docId) {
-          if (termPositions.next()) {
-            currentDoc = termPositions.doc();
-          } else {
-            this.count = resultCount;
-            return;
-          }
-        }
-
-        if (currentDoc == docId) {
-          SimpleIntList positions = this.positions[i];
-          if (positions.intersect(termPositions, offset)) {
-            this.docIds[resultCount] = docId;
-            this.positions[resultCount++] = positions;
-          }
-        }
-      }
-      this.count = resultCount;
     }
 
   }

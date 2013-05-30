@@ -136,4 +136,39 @@ public final class DocIdSets {
 
   }
 
+
+  /**
+   * Empty doc id set iterator.
+   */
+  private static final DocIdSetIterator EMPTY_ITERATOR =
+      new DocIdSetIterator() {
+        @Override
+        public int docID() {
+          return NO_MORE_DOCS;
+        }
+
+
+        @Override
+        public int nextDoc() throws IOException {
+          return NO_MORE_DOCS;
+        }
+
+
+        @Override
+        public int advance(final int target) throws IOException {
+          return NO_MORE_DOCS;
+        }
+      };
+
+
+  /**
+   * Empty doc id set.
+   */
+  public static final DocIdSet EMPTY = new DocIdSet() {
+    @Override
+    public DocIdSetIterator iterator() throws IOException {
+      return EMPTY_ITERATOR;
+    }
+  };
+
 }
