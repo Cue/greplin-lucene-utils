@@ -24,7 +24,7 @@ import java.io.IOException;
 /**
  * The most trivial intersection - just lets everything through.
  */
-public class AllDocsIntersectionProvider implements IntersectionProvider {
+public final class AllDocsIntersectionProvider implements IntersectionProvider {
 
   /**
    * Intersection constant that intersects with everything.
@@ -37,10 +37,25 @@ public class AllDocsIntersectionProvider implements IntersectionProvider {
     }
   };
 
+  /**
+   * Singleton instance of this class.
+   */
+  public static final IntersectionProvider INSTANCE =
+      new AllDocsIntersectionProvider();
+
+
+  /** Not instantiable. */
+  private AllDocsIntersectionProvider() { }
+
 
   @Override
   public Intersection get(final IndexReader reader) {
     return ALL_DOCS;
+  }
+
+  @Override
+  public String toString() {
+    return "AllDocsIntersectionProvider";
   }
 
 }

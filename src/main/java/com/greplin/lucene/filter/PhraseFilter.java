@@ -16,6 +16,7 @@
 
 package com.greplin.lucene.filter;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.greplin.lucene.index.IndexReaders;
@@ -82,7 +83,7 @@ public class PhraseFilter extends Filter {
    * @param terms the terms in the phrase
    */
   public PhraseFilter(final Term... terms) {
-    this(new AllDocsIntersectionProvider(), terms);
+    this(AllDocsIntersectionProvider.INSTANCE, terms);
   }
 
 
@@ -124,6 +125,37 @@ public class PhraseFilter extends Filter {
       terms[i] = new Term(field, values[i]);
     }
     return terms;
+  }
+
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    PhraseFilter that = (PhraseFilter) o;
+    return this.intersectionProvider.equals(that.intersectionProvider)
+        && Arrays.equals(this.terms, that.terms);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(
+        Arrays.hashCode(this.terms), this.intersectionProvider);
+  }
+
+
+  @Override
+  public String toString() {
+    return "PhraseFilter{"
+        + "terms=" + Arrays.toString(this.terms)
+        + ", intersectionProvider=" + this.intersectionProvider
+        + '}';
   }
 
 

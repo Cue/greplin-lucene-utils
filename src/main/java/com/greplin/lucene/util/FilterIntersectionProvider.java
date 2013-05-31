@@ -27,7 +27,7 @@ import java.io.IOException;
 /**
  * Intersection with another filter.
  */
-public class FilterIntersectionProvider implements IntersectionProvider {
+public final class FilterIntersectionProvider implements IntersectionProvider {
 
   /**
    * Simple Intersection that matches nothing.
@@ -60,6 +60,34 @@ public class FilterIntersectionProvider implements IntersectionProvider {
   public Intersection get(final IndexReader reader) throws IOException {
     DocIdSet docs = this.filter.getDocIdSet(reader);
     return docs == null ? NO_DOCS : new DocIdSetIntersection(docs);
+  }
+
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    FilterIntersectionProvider that = (FilterIntersectionProvider) o;
+    return this.filter.equals(that.filter);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return this.filter.hashCode();
+  }
+
+
+  @Override
+  public String toString() {
+    return "FilterIntersectionProvider{"
+        + "filter=" + this.filter
+        + '}';
   }
 
 

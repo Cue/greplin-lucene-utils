@@ -26,7 +26,8 @@ import java.io.IOException;
 /**
  * Intersection provider based on a bits provider.
  */
-public class BitsProviderIntersectionProvider implements IntersectionProvider {
+public final class BitsProviderIntersectionProvider
+    implements IntersectionProvider {
 
   /**
    * The bits provider to intersect with.
@@ -46,6 +47,35 @@ public class BitsProviderIntersectionProvider implements IntersectionProvider {
   @Override
   public Intersection get(final IndexReader reader) throws IOException {
     return new BitsIntersection(this.bitsProvider.get(reader));
+  }
+
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    BitsProviderIntersectionProvider that =
+        (BitsProviderIntersectionProvider) o;
+    return this.bitsProvider.equals(that.bitsProvider);
+  }
+
+
+  @Override
+  public int hashCode() {
+    return this.bitsProvider.hashCode();
+  }
+
+
+  @Override
+  public String toString() {
+    return "BitsProviderIntersectionProvider{"
+        + "bitsProvider=" + this.bitsProvider
+        + '}';
   }
 
 
