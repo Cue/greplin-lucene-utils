@@ -11,8 +11,9 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.FilteredQuery;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.PhraseQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
@@ -32,6 +33,8 @@ public class PhraseFilterBenchmark {
   private static final int AVERAGE_WORDS_PER_DOC = 100;
 
   private static final int WORDS_PER_DOC_DEVIATION = 95;
+
+  private static final int SECOND_FIELD_MATCH_PERCENTAGE = 50;
 
 
   private static final int ROUNDS = 4;
@@ -127,6 +130,8 @@ public class PhraseFilterBenchmark {
           int wordCount = RANDOM.nextInt(WORDS_PER_DOC_DEVIATION * 2) + AVERAGE_WORDS_PER_DOC - WORDS_PER_DOC_DEVIATION;
           Document doc = new Document();
           doc.add(new Field("f", Joiner.on(' ').join(words(wordCount)), Field.Store.YES, Field.Index.ANALYZED));
+          doc.add(new Field("second", RANDOM.nextInt(100) >= SECOND_FIELD_MATCH_PERCENTAGE ? "yes" : "no",
+              Field.Store.NO, Field.Index.ANALYZED));
           writer.addDocument(doc);
         }
         writer.commit();
@@ -166,7 +171,7 @@ public class PhraseFilterBenchmark {
             long hits = 0;
             for (String[] queryWords : queries) {
               PhraseFilter pf = new PhraseFilter(FIELD, queryWords);
-              hits += searcher.search(new FilteredQuery(new MatchAllDocsQuery(), pf), 1).totalHits;
+              hits += searcher.search(new FilteredQuery(new TermQuery(new Term("second", "yes")), pf), 1).totalHits;
             }
             ms1 = System.currentTimeMillis() - millis;
             System.out.println("Finished " + name1 + " in " + ms1 + "ms with " + hits + " hits");
@@ -178,8 +183,11 @@ public class PhraseFilterBenchmark {
               for (Term term : queryTerms) {
                 pq.add(term);
               }
-              hits += searcher.search(
-                  BooleanQueryBuilder.builder().must(new MatchAllDocsQuery()).must(pq).build(), 1).totalHits;
+              Query query = BooleanQueryBuilder.builder()
+                  .must(new TermQuery(new Term("second", "yes")))
+                  .must(pq)
+                  .build();
+              hits += searcher.search(query, 1).totalHits;
             }
             ms2 = System.currentTimeMillis() - millis;
             System.out.println("Finished " + name2 + " in " + ms2 + "ms with " + hits + " hits");
