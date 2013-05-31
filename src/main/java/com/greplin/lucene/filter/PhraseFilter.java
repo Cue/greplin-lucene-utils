@@ -217,7 +217,8 @@ public class PhraseFilter extends Filter {
 
     @Override
     public int docID() {
-      return this.ints[this.index];
+      return this.index < this.ints.length
+          ? this.ints[this.index] : NO_MORE_DOCS;
     }
 
 
