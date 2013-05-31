@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 public class BaseFilterTest {
 
-  protected IndexWriter createWriter() throws Exception {
+  protected IndexWriter createWriter() throws IOException {
     Directory directory = new RAMDirectory();
     return new IndexWriter(directory,
         new IndexWriterConfig(Version.LUCENE_32, new WhitespaceAnalyzer(Version.LUCENE_32)));

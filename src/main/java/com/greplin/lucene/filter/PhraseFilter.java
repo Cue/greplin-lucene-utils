@@ -1,8 +1,27 @@
+/*
+ * Copyright 2013 The greplin-lucene-utils Authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.greplin.lucene.filter;
 
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.greplin.lucene.index.IndexReaders;
+import com.greplin.lucene.util.AllDocsIntersectionProvider;
+import com.greplin.lucene.util.Intersection;
+import com.greplin.lucene.util.IntersectionProvider;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermPositions;
@@ -25,6 +44,10 @@ import java.util.SortedSet;
  * - does not compute score
  * - does not support slop
  *
+ * Additional features:
+ * - supports AND type intersection queries, this will perform
+ *   much better than an external BooleanFilter
+ *
  * Optimization notes:
  * - Using a shared TermPositions with seeking saves about 10% !
  */
@@ -37,11 +60,29 @@ public class PhraseFilter extends Filter {
 
 
   /**
+   * The intersection provider.
+   */
+  private final IntersectionProvider intersectionProvider;
+
+
+  /**
+   * Construct a new phrase filter.
+   * @param intersectionProvider other doc id set to intersect with
+   * @param terms the terms in the phrase
+   */
+  public PhraseFilter(
+      final IntersectionProvider intersectionProvider, final Term... terms) {
+    this.terms = Arrays.copyOf(terms, terms.length);
+    this.intersectionProvider = intersectionProvider;
+  }
+
+
+  /**
    * Construct a new phrase filter.
    * @param terms the terms in the phrase
    */
   public PhraseFilter(final Term... terms) {
-    this.terms = Arrays.copyOf(terms, terms.length);
+    this(new AllDocsIntersectionProvider(), terms);
   }
 
 
@@ -51,10 +92,38 @@ public class PhraseFilter extends Filter {
    * @param terms the terms in the phrase
    */
   public PhraseFilter(final String field, final String... terms) {
-    this.terms = new Term[terms.length];
-    for (int i = 0; i < terms.length; i++) {
-      this.terms[i] = new Term(field, terms[i]);
+    this(convertToTerms(field, terms));
+  }
+
+
+  /**
+   * Construct a new phrase filter.
+   * @param intersectionProvider other doc id set to intersect with
+   * @param field the field to find phrases in
+   * @param terms the terms in the phrase
+   */
+  public PhraseFilter(
+      final IntersectionProvider intersectionProvider,
+      final String field,
+      final String... terms) {
+    this(intersectionProvider, convertToTerms(field, terms));
+  }
+
+
+  /**
+   * Internal utility method that converts a field name and set of values to
+   * an array of terms.
+   * @param field the field
+   * @param values the values
+   * @return array of terms, one per value, each with the given field
+   */
+  private static Term[] convertToTerms(
+      final String field, final String... values) {
+    Term[] terms = new Term[values.length];
+    for (int i = 0; i < values.length; i++) {
+      terms[i] = new Term(field, values[i]);
     }
+    return terms;
   }
 
 
@@ -85,9 +154,12 @@ public class PhraseFilter extends Filter {
           termPositions.seek(term.term);
 
           if (matches == null) {
-            // If this is the first term, collect all matches.
+            // If this is the first term, collect all matches that intersect
+            // with the provided initial document set.
+            Intersection intersection = this.intersectionProvider.get(reader);
+
             matches = new PhraseFilterMatchList(term.docFreq);
-            while (termPositions.next()) {
+            while (intersection.advanceToNextIntersection(termPositions)) {
               int freq = termPositions.freq();
               PhraseFilterIntList list = new PhraseFilterIntList(freq);
               for (int i = 0; i < freq; i++) {

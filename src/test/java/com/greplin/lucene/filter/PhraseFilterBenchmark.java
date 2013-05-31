@@ -1,7 +1,24 @@
+/*
+ * Copyright 2013 The greplin-lucene-utils Authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.greplin.lucene.filter;
 
 import com.google.common.base.Joiner;
 import com.greplin.lucene.query.BooleanQueryBuilder;
+import com.greplin.lucene.util.FilterIntersectionProvider;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -11,6 +28,7 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.FilteredQuery;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -130,7 +148,7 @@ public class PhraseFilterBenchmark {
           int wordCount = RANDOM.nextInt(WORDS_PER_DOC_DEVIATION * 2) + AVERAGE_WORDS_PER_DOC - WORDS_PER_DOC_DEVIATION;
           Document doc = new Document();
           doc.add(new Field("f", Joiner.on(' ').join(words(wordCount)), Field.Store.YES, Field.Index.ANALYZED));
-          doc.add(new Field("second", RANDOM.nextInt(100) >= SECOND_FIELD_MATCH_PERCENTAGE ? "yes" : "no",
+          doc.add(new Field("second", RANDOM.nextInt(100) < SECOND_FIELD_MATCH_PERCENTAGE ? "yes" : "no",
               Field.Store.NO, Field.Index.ANALYZED));
           writer.addDocument(doc);
         }
@@ -170,8 +188,9 @@ public class PhraseFilterBenchmark {
             long millis = System.currentTimeMillis();
             long hits = 0;
             for (String[] queryWords : queries) {
-              PhraseFilter pf = new PhraseFilter(FIELD, queryWords);
-              hits += searcher.search(new FilteredQuery(new TermQuery(new Term("second", "yes")), pf), 1).totalHits;
+              PhraseFilter pf = new PhraseFilter(
+                  new FilterIntersectionProvider(TermsFilter.from(new Term("second", "yes"))), FIELD, queryWords);
+              hits += searcher.search(new FilteredQuery(new MatchAllDocsQuery(), pf), 1).totalHits;
             }
             ms1 = System.currentTimeMillis() - millis;
             System.out.println("Finished " + name1 + " in " + ms1 + "ms with " + hits + " hits");
