@@ -77,4 +77,74 @@ public class BooleanBitsProvider extends BitsProvider {
     return Objects.toStringHelper(this).add("clauses", this.clauses).toString();
   }
 
+
+  /**
+   * @return Builder object to create a BooleanBitsProvider
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+
+  /**
+   * Builder pattern.
+   */
+  public static final class Builder {
+
+    /**
+     * The in-progress bits provider.
+     */
+    private final BooleanBitsProvider bitsProvider;
+
+
+    /**
+     * Not externally instantiable - use BooleanBitsProvider.builder() instead.
+     */
+    private Builder() {
+      this.bitsProvider = new BooleanBitsProvider();
+    }
+
+
+    /**
+     * Require matching the given bits provider.
+     * @param bitsProvider the bits provider
+     * @return this builder, for chaining
+     */
+    public Builder must(final BitsProvider bitsProvider) {
+      this.bitsProvider.add(bitsProvider, BooleanClause.Occur.MUST);
+      return this;
+    }
+
+
+    /**
+     * Require at least one bits provider added as "should".
+     * @param bitsProvider the bits provider
+     * @return this builder, for chaining
+     */
+    public Builder should(final BitsProvider bitsProvider) {
+      this.bitsProvider.add(bitsProvider, BooleanClause.Occur.SHOULD);
+      return this;
+    }
+
+
+    /**
+     * Require documents to not match this bits provider.
+     * @param bitsProvider the bits provider
+     * @return this builder, for chaining
+     */
+    public Builder mustNot(final BitsProvider bitsProvider) {
+      this.bitsProvider.add(bitsProvider, BooleanClause.Occur.MUST_NOT);
+      return this;
+    }
+
+
+    /**
+     * @return the constructed bits provider
+     */
+    public BooleanBitsProvider build() {
+      return this.bitsProvider;
+    }
+
+  }
+
 }
